@@ -8,8 +8,6 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -139,11 +137,6 @@ public class Game extends Canvas {
                     //then when they hit each other the flag is set and the event-fucntion is triggered for each of the two ants. 
                     //when the ants nolonger are touching, the flag is again set to 0.
             
-            //Move ant
-            //ant.setHorizontalMovement(40);
-            //ant.setVerticalMovement(15);
-            ant.setSpeed(10);
-            ant.setAngleDegrees(180);
             
             // work out how long its been since the last update, this
 
@@ -166,7 +159,7 @@ public class Game extends Canvas {
             if (delta > 0) {
                 g.setColor(Color.black);
 
-                g.drawString("FPS: " + 1000 / delta, 2, 20);
+                g.drawString("FPS: " + 1000 / delta + " X: " + ant.getX() + " Y: " + ant.getY(), 2, 20);
             }
 
             // cycle round asking each entity to move itself
@@ -270,7 +263,8 @@ public class Game extends Canvas {
     private void initEntities() {
         ant = new AntEntity(this, "ant.jpg", 100, 100);
         entities.add(ant);
-
+        ant.setSpeed(40);
+        ant.setAngle(0.5);
     }
 
     /**
