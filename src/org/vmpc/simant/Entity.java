@@ -85,12 +85,23 @@ public abstract class Entity {
     /**
      * Set the angle of this entity
      * 
-     * @param ang The vertical speed of this entity
+     * @param ang The angle of this entity in degrees
+     */
+    public void setAngleDegrees(double ang) {
+       this.angle = Math.toRadians(ang);
+       this.dy = Math.sin(Math.toRadians(ang));
+       this.dx = Math.cos(Math.toRadians(ang));
+    }
+    
+    /**
+     * Set the angle of this entity
+     * 
+     * @param ang The angle of this entity in radians
      */
     public void setAngle(double ang) {
        this.angle = ang;
-       this.dy = Math.sin(Math.toRadians(ang));
-       this.dx = Math.cos(Math.toRadians(ang));
+       this.dy = Math.sin(ang);
+       this.dx = Math.cos(ang);
     }
     
     /**
@@ -130,6 +141,15 @@ public abstract class Entity {
     }
     
     /**
+     * Get the angle of this entity in degrees
+     * 
+     * @return The angle of this entity
+     */
+    public double getAngleDegrees() {
+        return Math.toDegrees(this.angle);
+    }
+    
+    /**
      * Set the Speed of this entity
      * 
      * @param ang The speed of this entity (pixels/sec)
@@ -144,7 +164,9 @@ public abstract class Entity {
      * @param g The graphics context on which to draw
      */
     public void draw(Graphics g) {
+        
         sprite.draw(g, (int) x, (int) y);
+        
     }
 
     /**

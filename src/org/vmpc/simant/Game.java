@@ -143,7 +143,7 @@ public class Game extends Canvas {
             //ant.setHorizontalMovement(40);
             //ant.setVerticalMovement(15);
             ant.setSpeed(10);
-            ant.setAngle(270);
+            ant.setAngleDegrees(270);
             
             // work out how long its been since the last update, this
 
