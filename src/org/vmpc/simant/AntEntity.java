@@ -36,19 +36,32 @@ public class AntEntity extends Entity {
 	 */
 	public void move(long delta) {
 		// if we're moving left and have reached the left hand side
-
-		// of the screen, don't move
-
-		if ((dx < 0) && (x < 10)) {
-			return;
+		// of the screen, jump to the right hand side
+		if ((dx < 0) && (x < 0/* minus halve størrelsen*/)) {
+                    x = game.getcanvasWidth();
+                    return;
 		}
+                
 		// if we're moving right and have reached the right hand side
-
-		// of the screen, don't move
-
-		if ((dx > 0) && (x > 750)) {
-			return;
+		// of the screen, jump to the left hand side
+		if ((dx > 0) && (x > game.getcanvasWidth()/* pluss halve størrelsen*/)) {
+                    x = 0;
+                    return;
 		}
+                // if we're moving up and have reached the top
+		// of the screen, jump to the bottom
+		if ((dy < 0) && (y < 0/* minus halve størrelsen*/)) {
+                    y = game.getcanvasHeight();
+                    return;
+		}
+                
+		// if we're moving down and have reached the bottom
+		// of the screen, jump to the top
+		if ((dy > 0) && (y > game.getcanvasHeight()/* pluss halve størrelsen*/)) {
+                    y = 0;
+                    return;
+		}
+                
 		
 		super.move(delta);
 	}

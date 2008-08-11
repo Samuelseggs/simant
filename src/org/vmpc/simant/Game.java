@@ -52,6 +52,7 @@ public class Game extends Canvas {
     private boolean firePressed = false;
     /** True if game logic needs to be applied this loop, normally as a result of a game event */
     private boolean logicRequiredThisLoop = false;
+    
     private int canvasWidth = 800;
     private int canvasHeight = 600;
 
@@ -263,8 +264,18 @@ public class Game extends Canvas {
     private void initEntities() {
         ant = new AntEntity(this, "ant.jpg", 100, 100);
         entities.add(ant);
-        ant.setSpeed(40);
-        ant.setAngle(0.5);
+        ant.setSpeed(60);
+        ant.setAngle(0.4);
+    }
+    
+    
+    
+    //get size of canvas
+    public int getcanvasWidth() {
+        return this.canvasWidth;
+    }
+    public int getcanvasHeight() {
+        return this.canvasHeight;
     }
 
     /**
