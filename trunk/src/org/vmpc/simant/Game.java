@@ -8,6 +8,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -52,9 +53,7 @@ public class Game extends Canvas {
     private boolean firePressed = false;
     /** True if game logic needs to be applied this loop, normally as a result of a game event */
     private boolean logicRequiredThisLoop = false;
-    
     private double test = 0;
-    
     private int canvasWidth = 800;
     private int canvasHeight = 600;
 
@@ -123,32 +122,38 @@ public class Game extends Canvas {
 
     public void gameLoop() {
         long lastLoopTime = System.currentTimeMillis();
-
+        double lastFrameRateTime = System.currentTimeMillis();
+        double lastFrameRate = 0;
+        ArrayList<Long> frameRates = new ArrayList();
+        double frameRate;
+        double checkFrameRateEveryMilli = 250;
+        double deltaFrameRate;
+        long delta;
         // keep looping round til the game ends
 
         while (gameRunning) {
-            
-            
+
+
             //1: move ants
-            
+
             //2: check for collisions
-                //a: edges
-                    //off the screen, and in at the other side? or bounce?
-                //b: other ants
-                    //to begin with i think we should let the ants run over each other, and not collide.
-                    //to achive this we need all ants to have an array of bitflags with one member pr. ant.
-                    //then when they hit each other the flag is set and the event-fucntion is triggered for each of the two ants. 
-                    //when the ants nolonger are touching, the flag is again set to 0.
-            
-            
+            //a: edges
+            //off the screen, and in at the other side? or bounce?
+            //b: other ants
+            //to begin with i think we should let the ants run over each other, and not collide.
+            //to achive this we need all ants to have an array of bitflags with one member pr. ant.
+            //then when they hit each other the flag is set and the event-fucntion is triggered for each of the two ants. 
+            //when the ants nolonger are touching, the flag is again set to 0.
+
+
             // work out how long its been since the last update, this
 
             // will be used to calculate how far the entities should
 
             // move this loop
-            
-            long delta = System.currentTimeMillis() - lastLoopTime;
 
+            delta = System.currentTimeMillis() - lastLoopTime;
+            deltaFrameRate = System.currentTimeMillis() - lastFrameRateTime;
             lastLoopTime = System.currentTimeMillis();
 
             // Get hold of a graphics context for the accelerated 
@@ -156,19 +161,40 @@ public class Game extends Canvas {
             // surface and blank it out
 
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             g.setColor(Color.white);
             g.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            if (delta > 0) {
-                g.setColor(Color.black);
-
-                g.drawString("FPS: " + 1000 / delta + " X: " + ant.getX() + " Y: " + ant.getY(), 2, 20);
+            //Add a framerate to the list of frames
+            if(delta > 0) {
+                frameRates.add(1000 / delta);
             }
-            
-            
-           // if(ant.getX() > 300) {
+
+            if (deltaFrameRate > checkFrameRateEveryMilli) {
+                double frameRateTotal = 0;
+                for (double aFrameRate : frameRates) {
+                    frameRateTotal += aFrameRate;
+                }
+                //Get the average framerate
+                frameRate = frameRateTotal / frameRates.size();
+                lastFrameRate = frameRate;
+                lastFrameRateTime = System.currentTimeMillis();
+
+            } else {
+                frameRate = lastFrameRate;
+            }
+            g.setColor(Color.black);
+
+            g.drawString("FPS: " + frameRate, 2, 20);
+            g.drawString("Coordinates: (" + ant.getX() + ", " + ant.getY() + ")", 2, 40);
+
+
+
+            // if(ant.getX() > 300) {
             //    ant.setAngle(-0.8);
-          //  }
+            //  }
             ant.setAngleDegrees(this.test);
             this.test++;
             // cycle round asking each entity to move itself
@@ -194,16 +220,16 @@ public class Game extends Canvas {
             // both entities that the collision has occured
 /*
             for (int p = 0; p < entities.size(); p++) {
-                for (int s = p + 1; s < entities.size(); s++) {
-                    Entity me = (Entity) entities.get(p);
-                    Entity him = (Entity) entities.get(s);
-                    if (me.collidesWith(him)) {
-                        me.collidedWith(him);
-                        him.collidedWith(me);
-                    }
-                }
+            for (int s = p + 1; s < entities.size(); s++) {
+            Entity me = (Entity) entities.get(p);
+            Entity him = (Entity) entities.get(s);
+            if (me.collidesWith(him)) {
+            me.collidedWith(him);
+            him.collidedWith(me);
             }
-*/
+            }
+            }
+             */
             // remove any entity that has been marked for clear up
 
             entities.removeAll(removeList);
@@ -237,7 +263,6 @@ public class Game extends Canvas {
              */
             // finally, we've completed drawing so clear up the graphics
             // and flip the buffer over
-
             g.dispose();
             strategy.show();
             // resolve the movement of the ant. First assume the ant 
@@ -264,7 +289,7 @@ public class Game extends Canvas {
             try {
                 Thread.sleep(10);
             } catch (Exception e) {
-            //Do nothing
+                //Do nothing
             }
         }
     }
@@ -275,13 +300,12 @@ public class Game extends Canvas {
         ant.setSpeed(0);
         ant.setAngle(0.4);
     }
-    
-    
-    
+
     //get size of canvas
     public int getcanvasWidth() {
         return this.canvasWidth;
     }
+
     public int getcanvasHeight() {
         return this.canvasHeight;
     }
