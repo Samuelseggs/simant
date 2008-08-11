@@ -318,10 +318,10 @@ public class Game extends Canvas {
            
         //adding more ants..
         for (int x=1;x<100;x++) {
-            Entity entity = new AntEntity(this, "antpng.png", 100 + 40*x, 100 + 40*x);
+            Entity entity = new AntEntity(this, "antpng.png",1 + x*7, 1 + x*7);
             entities.add(entity);
             entity.setSpeed(40);
-            entity.setAngleDegrees(1 + x* Math.random()*7);
+            entity.setAngleDegrees(1 + x*7*Math.random());
         }
             
 
