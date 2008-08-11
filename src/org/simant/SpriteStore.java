@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package simant;
+package org.simant;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;

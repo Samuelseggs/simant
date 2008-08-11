@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package simant;
+package org.simant;
 
 /**
  * The entity that represents the players ship
