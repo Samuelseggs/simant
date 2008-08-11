@@ -292,6 +292,7 @@ public class Game extends Canvas {
             // 100 fps but on windows this might vary each loop due to
 
             // a bad implementation of timer
+            // Finner du denne endringen?
 
             try {
                 Thread.sleep(10);
