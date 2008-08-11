@@ -302,8 +302,8 @@ public class Game extends Canvas {
     private void initEntities() {
         ant = new AntEntity(this, "antpng.png", 100, 100);
         entities.add(ant);
-        ant.setSpeed(10);
-        ant.setAngle(2);
+        ant.setSpeed(40);
+        ant.setAngle(1.57);
     }
 
     //get size of canvas
