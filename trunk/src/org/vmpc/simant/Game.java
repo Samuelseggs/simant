@@ -200,8 +200,8 @@ public class Game extends Canvas {
             // if(ant.getX() > 300) {
             //    ant.setAngle(-0.8);
             //  }
-            ant.setAngleDegrees(this.test);
-            this.test++;
+            //ant.setAngleDegrees(this.test);
+           // this.test++;
             // cycle round asking each entity to move itself
 
             //if (!waitingForKeyPress) {
@@ -300,10 +300,10 @@ public class Game extends Canvas {
     }
 
     private void initEntities() {
-        ant = new AntEntity(this, "ant.png", 100, 100);
+        ant = new AntEntity(this, "antpng.png", 100, 100);
         entities.add(ant);
-        ant.setSpeed(0);
-        ant.setAngle(0.4);
+        ant.setSpeed(10);
+        ant.setAngle(2);
     }
 
     //get size of canvas

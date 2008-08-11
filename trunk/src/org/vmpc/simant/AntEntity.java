@@ -37,7 +37,7 @@ public class AntEntity extends Entity {
 	public void move(long delta) {
 		// if we're moving left and have reached the left hand side
 		// of the screen, jump to the right hand side
-		if ((dx < 0) && (x < 0/* minus halve størrelsen*/)) {
+		if ((dx < 0) && (x < 0 - sprite.getWidth())) {
                     x = game.getcanvasWidth();
                     return;
 		}
@@ -45,7 +45,7 @@ public class AntEntity extends Entity {
 		// if we're moving right and have reached the right hand side
 		// of the screen, jump to the left hand side
 		if ((dx > 0) && (x > game.getcanvasWidth()/* pluss halve størrelsen*/)) {
-                    x = 0;
+                    x = 0 - sprite.getWidth();
                     return;
 		}
                 // if we're moving up and have reached the top
