@@ -30,7 +30,7 @@ public abstract class Entity {
     protected double dy;
     /** The angle of this entity */
     protected double angle;
-    // The speed of this entity */
+    /** The speed of this entity */
     protected double speed;
     /** The rectangle used for this entity during collisions  resolution */
     private Rectangle me = new Rectangle();
@@ -163,6 +163,9 @@ public abstract class Entity {
      * @param g The graphics context on which to draw
      */
     public void draw(Graphics2D g) {
+        //Our problem is that the coordinate system is already rotated around the last point.
+        //we need a new graphic object i guess? :S.. or maybe we can rotate this one once more? relative to the last?
+        //g.rotate(angle - lastAngle, x + sprite.getWidth()/2 - lastX, y + sprite.getHeight()/2 - lastY);
         g.rotate(angle, x + sprite.getWidth()/2, y + sprite.getHeight()/2);
         sprite.draw(g, (int) x, (int) y);
     }

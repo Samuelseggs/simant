@@ -33,6 +33,8 @@ public class Game extends Canvas {
     private ArrayList removeList = new ArrayList();
     /** The entity representing the player */
     private Entity ant;
+    /** Test **/
+    private Entity pig;
     /** The speed at which the player's ant should move (pixels/sec) */
     private double moveSpeed = 300;
     /** The time at which last fired a shot */
@@ -300,10 +302,27 @@ public class Game extends Canvas {
     }
 
     private void initEntities() {
-        ant = new AntEntity(this, "antpng.png", 100, 100);
+       
+//        pig = new AntEntity(this, "ant.png", 200, 400);
+//        entities.add(pig);
+//        pig.setSpeed(40);
+//        pig.setAngle(1.57);
+        
+        ant = new AntEntity(this, "antpng.png", 200, 400);
         entities.add(ant);
         ant.setSpeed(40);
-        ant.setAngle(1.57);
+        ant.setAngleDegrees(300);
+         
+            /*
+        //adding more ants..
+        for (int x=1;x<8;x++) {
+            Entity entity = new AntEntity(this, "antpng.png", 100 + 40*x, 100 + 40*x);
+            entities.add(entity);
+            entity.setSpeed(40);
+            entity.setAngleDegrees(1 + 10 *x);
+        }*/
+            
+
     }
 
     //get size of canvas
