@@ -127,9 +127,21 @@ public class Game extends Canvas {
 
         while (gameRunning) {
             
+            
+            //1: move ants
+            
+            //2: check for collisions
+                //a: edges
+                    //off the screen, and in at the other side? or bounce?
+                //b: other ants
+                    //to begin with i think we should let the ants run over each other, and not collide.
+                    //to achive this we need all ants to have an array of bitflags with one member pr. ant.
+                    //then when they hit each other the flag is set and the event-fucntion is triggered for each of the two ants. 
+                    //when the ants nolonger are touching, the flag is again set to 0.
+            
             //Move ant
             ant.setHorizontalMovement(40);
-            ant.setVerticalMovement(10);
+            ant.setVerticalMovement(15);
             
             // work out how long its been since the last update, this
 
