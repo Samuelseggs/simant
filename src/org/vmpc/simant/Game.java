@@ -270,7 +270,7 @@ public class Game extends Canvas {
     }
 
     private void initEntities() {
-        ant = new AntEntity(this, "ant.jpg", 100, 100);
+        ant = new AntEntity(this, "ant.png", 100, 100);
         entities.add(ant);
         ant.setSpeed(0);
         ant.setAngle(0.4);
