@@ -168,7 +168,7 @@ public class Game extends Canvas {
                     RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             
             // Set the background color and fill the background
-            g.setColor(Color.white);
+            g.setColor(Color.green);
             g.fillRect(0, 0, canvasWidth, canvasHeight);
 
             //Add a framerate to the list of frames if the delta is not 0
@@ -192,11 +192,6 @@ public class Game extends Canvas {
             } else {
                 frameRate = lastFrameRate;
             }
-            g.setColor(Color.black);
-
-            g.drawString("FPS: " + frameRate, 2, 20);
-            g.drawString("Coordinates: (" + ant.getX() + ", " + ant.getY() + ")", 2, 40);
-
 
 
             // if(ant.getX() > 300) {
@@ -256,7 +251,13 @@ public class Game extends Canvas {
             }
 
             logicRequiredThisLoop = false;
+               
+           
+            g.setColor(Color.black);
 
+            /** Draw stats  **/
+            g.drawString("FPS: " + frameRate, 2, 20);
+            g.drawString("Coordinates: (" + ant.getX() + ", " + ant.getY() + ")", 2, 40);
 
             // if we're waiting for an "any key" press then draw the 
             // current message 
@@ -316,11 +317,11 @@ public class Game extends Canvas {
          
            
         //adding more ants..
-        for (int x=1;x<8;x++) {
+        for (int x=1;x<100;x++) {
             Entity entity = new AntEntity(this, "antpng.png", 100 + 40*x, 100 + 40*x);
             entities.add(entity);
             entity.setSpeed(40);
-            entity.setAngleDegrees(1 + 10 *x);
+            entity.setAngleDegrees(1 + x* Math.random()*7);
         }
             
 
