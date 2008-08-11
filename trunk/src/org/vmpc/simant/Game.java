@@ -161,24 +161,30 @@ public class Game extends Canvas {
             // surface and blank it out
 
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-
+            
+            // Set the graphics to use a bicbic filter
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                     RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            
+            // Set the background color and fill the background
             g.setColor(Color.white);
             g.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            //Add a framerate to the list of frames
+            //Add a framerate to the list of frames if the delta is not 0
             if(delta > 0) {
                 frameRates.add(1000 / delta);
             }
-
+            //Check if it is about time to calculate the average framerate
             if (deltaFrameRate > checkFrameRateEveryMilli) {
                 double frameRateTotal = 0;
+                // Sum all measured framerates
                 for (double aFrameRate : frameRates) {
                     frameRateTotal += aFrameRate;
                 }
                 //Get the average framerate
                 frameRate = frameRateTotal / frameRates.size();
+                //Get ready for new measurements
+                frameRates.clear();
                 lastFrameRate = frameRate;
                 lastFrameRateTime = System.currentTimeMillis();
 
