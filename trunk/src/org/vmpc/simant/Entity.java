@@ -1,8 +1,7 @@
 package org.vmpc.simant;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.lang.Math;
 
 /**
  * An entity represents any element that appears in the game. The
@@ -163,10 +162,9 @@ public abstract class Entity {
      * 
      * @param g The graphics context on which to draw
      */
-    public void draw(Graphics g) {
-        
+    public void draw(Graphics2D g) {
+        g.rotate(angle, sprite.getWidth()/2,sprite.getHeight()/2);
         sprite.draw(g, (int) x, (int) y);
-        
     }
 
     /**
