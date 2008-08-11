@@ -314,7 +314,7 @@ public class Game extends Canvas {
         for (int x=1;x<100;x++) {
             Entity entity = new AntEntity(this, "antpng.png",1 + x*7, 1 + x*7);
             entities.add(entity);
-            entity.setSpeed(40);
+            entity.setSpeed(40+x);
             entity.setAngleDegrees(1 + x*7*Math.random());
         }
             
