@@ -145,7 +145,6 @@ public class Game extends Canvas {
             //then when they hit each other the flag is set and the event-fucntion is triggered for each of the two ants. 
             //when the ants nolonger are touching, the flag is again set to 0.
 
-
             // work out how long its been since the last update, this
 
             // will be used to calculate how far the entities should
