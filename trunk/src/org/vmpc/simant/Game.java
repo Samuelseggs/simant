@@ -128,7 +128,7 @@ public class Game extends Canvas {
         while (gameRunning) {
             
             //Move ant
-            ant.setHorizontalMovement(20);
+            ant.setHorizontalMovement(15);
             
             // work out how long its been since the last update, this
 
