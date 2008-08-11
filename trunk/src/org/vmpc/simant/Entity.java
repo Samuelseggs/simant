@@ -1,4 +1,4 @@
-package org.simant;
+package org.vmpc.simant;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
