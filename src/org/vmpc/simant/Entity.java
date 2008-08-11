@@ -166,8 +166,12 @@ public abstract class Entity {
         //Our problem is that the coordinate system is already rotated around the last point.
         //we need a new graphic object i guess? :S.. or maybe we can rotate this one once more? relative to the last?
         //g.rotate(angle - lastAngle, x + sprite.getWidth()/2 - lastX, y + sprite.getHeight()/2 - lastY);
-        g.rotate(angle, x + sprite.getWidth()/2, y + sprite.getHeight()/2);
+        double theta = angle;
+        double thetaX = x + sprite.getWidth()/2;
+        double thetaY = y + sprite.getHeight()/2;
+        g.rotate(theta,thetaX,thetaY);
         sprite.draw(g, (int) x, (int) y);
+        g.rotate(-theta,thetaX,thetaY);
     }
 
     /**
