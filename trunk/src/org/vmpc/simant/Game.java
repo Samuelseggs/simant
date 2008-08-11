@@ -162,6 +162,10 @@ public class Game extends Canvas {
 
                 g.drawString("FPS: " + 1000 / delta + " X: " + ant.getX() + " Y: " + ant.getY(), 2, 20);
             }
+            
+            if(ant.getX() > 300) {
+                ant.setAngle(-0.8);
+            }
 
             // cycle round asking each entity to move itself
 

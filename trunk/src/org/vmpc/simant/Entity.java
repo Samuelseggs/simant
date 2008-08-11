@@ -163,7 +163,7 @@ public abstract class Entity {
      * @param g The graphics context on which to draw
      */
     public void draw(Graphics2D g) {
-        g.rotate(angle, sprite.getWidth()/2,sprite.getHeight()/2);
+        g.rotate(angle, x - sprite.getWidth()/2, y - sprite.getHeight()/2);
         sprite.draw(g, (int) x, (int) y);
     }
 
