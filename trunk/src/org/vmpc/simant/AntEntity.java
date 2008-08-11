@@ -50,7 +50,7 @@ public class AntEntity extends Entity {
 		}
                 // if we're moving up and have reached the top
 		// of the screen, jump to the bottom
-		if ((dy < 0) && (y < 0/* minus halve størrelsen*/)) {
+		if ((dy < 0) && (y < 0 - sprite.getHeight())) {
                     y = game.getcanvasHeight();
                     return;
 		}
@@ -58,7 +58,7 @@ public class AntEntity extends Entity {
 		// if we're moving down and have reached the bottom
 		// of the screen, jump to the top
 		if ((dy > 0) && (y > game.getcanvasHeight()/* pluss halve størrelsen*/)) {
-                    y = 0;
+                    y = 0 - sprite.getHeight();
                     return;
 		}
                 
