@@ -129,13 +129,14 @@ public class Game extends Canvas {
             
             //Move ant
             ant.setHorizontalMovement(40);
+            ant.setVerticalMovement(10);
             
             // work out how long its been since the last update, this
 
             // will be used to calculate how far the entities should
 
             // move this loop
-
+            
             long delta = System.currentTimeMillis() - lastLoopTime;
 
             lastLoopTime = System.currentTimeMillis();
