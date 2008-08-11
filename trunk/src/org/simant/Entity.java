@@ -1,4 +1,4 @@
-package simant;
+package org.simant;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
