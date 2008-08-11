@@ -193,32 +193,47 @@ public class Game extends Canvas {
                 frameRate = lastFrameRate;
             }
 
-
-            // if(ant.getX() > 300) {
-            //    ant.setAngle(-0.8);
-            //  }
-            //ant.setAngleDegrees(this.test);
-           // this.test++;
-            // cycle round asking each entity to move itself
-
             //if (!waitingForKeyPress) {
+            
+            
+            /** Loop trough our entities **/
             for (int i = 0; i < entities.size(); i++) {
                 Entity entity = (Entity) entities.get(i);
+                
+                //move the entity
                 entity.move(delta);
-            }
-            //}
-
-            // cycle round drawing all the entities we have in the game
-
-            for (int i = 0; i < entities.size(); i++) {
-                Entity entity = (Entity) entities.get(i);
+                
+                //draw the entity
                 entity.draw(g);
+                
+                // if a game event has indicated that game logic should
+                // be resolved, cycle round every entity requesting that
+                // their personal logic should be considered.
+                if (logicRequiredThisLoop)
+                    entity.doLogic();
             }
-
+            logicRequiredThisLoop = false;
+            
+            
+            //VjNote: Har dette noe å gjøre med oss?
+            // remove any entity that has been marked for clear up
+            entities.removeAll(removeList);
+            removeList.clear();
+            
+            
+            /** Draw stats  **/
+            g.setColor(Color.black);
+            g.drawString("FPS: " + frameRate, 2, 20);
+            g.drawString("Coordinates: (" + ant.getX() + ", " + ant.getY() + ")", 2, 40);
+            
+            // finally, we've completed drawing so clear up the graphics
+            // and flip the buffer over
+            g.dispose();
+            strategy.show();
+            
+            
             // brute force collisions, compare every entity against
-
             // every other entity. If any of them collide notify 
-
             // both entities that the collision has occured
 /*
             for (int p = 0; p < entities.size(); p++) {
@@ -232,33 +247,18 @@ public class Game extends Canvas {
             }
             }
              */
-            // remove any entity that has been marked for clear up
-
-            entities.removeAll(removeList);
-            removeList.clear();
 
             // if a game event has indicated that game logic should
-
             // be resolved, cycle round every entity requesting that
-
             // their personal logic should be considered.
 
-            if (logicRequiredThisLoop) {
-                for (int i = 0; i < entities.size(); i++) {
-                    Entity entity = (Entity) entities.get(i);
-                    entity.doLogic();
-                }
-            }
-
-            logicRequiredThisLoop = false;
-               
-           
-            g.setColor(Color.black);
-
-            /** Draw stats  **/
-            g.drawString("FPS: " + frameRate, 2, 20);
-            g.drawString("Coordinates: (" + ant.getX() + ", " + ant.getY() + ")", 2, 40);
-
+//            if (logicRequiredThisLoop) {
+//                for (int i = 0; i < entities.size(); i++) {
+//                    Entity entity = (Entity) entities.get(i);
+//                    
+//                }
+//            }
+            
             // if we're waiting for an "any key" press then draw the 
             // current message 
 /*
@@ -269,10 +269,7 @@ public class Game extends Canvas {
             }
              * 
              */
-            // finally, we've completed drawing so clear up the graphics
-            // and flip the buffer over
-            g.dispose();
-            strategy.show();
+
             // resolve the movement of the ant. First assume the ant 
             // isn't moving. If either cursor key is pressed then
             // update the movement appropraitely
@@ -291,10 +288,7 @@ public class Game extends Canvas {
             // finally pause for a bit. Note: this should run us at about
 
             // 100 fps but on windows this might vary each loop due to
-
             // a bad implementation of timer
-            // Finner du denne endringen?
-
             try {
                 Thread.sleep(10);
             } catch (Exception e) {
