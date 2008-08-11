@@ -2,6 +2,7 @@ package org.vmpc.simant;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.lang.Math;
 
 /**
  * An entity represents any element that appears in the game. The
@@ -28,6 +29,10 @@ public abstract class Entity {
     protected double dx;
     /** The current speed of this entity vertically (pixels/sec) */
     protected double dy;
+    /** The angle of this entity */
+    protected double angle;
+    // The speed of this entity */
+    protected double speed;
     /** The rectangle used for this entity during collisions  resolution */
     private Rectangle me = new Rectangle();
     /** The rectangle used for other entities during collision resolution */
@@ -55,8 +60,8 @@ public abstract class Entity {
     public void move(long delta) {
         // update the location of the entity based on move speeds
 
-        x += (delta * dx) / 1000;
-        y += (delta * dy) / 1000;
+        x += (delta * dx * this.speed) / 1000;
+        y += (delta * dy * this.speed) / 1000;
     }
 
     /**
@@ -76,6 +81,26 @@ public abstract class Entity {
     public void setVerticalMovement(double dy) {
         this.dy = dy;
     }
+    
+    /**
+     * Set the angle of this entity
+     * 
+     * @param ang The vertical speed of this entity
+     */
+    public void setAngle(double ang) {
+       this.angle = ang;
+       this.dy = Math.sin(Math.toRadians(ang));
+       this.dx = Math.cos(Math.toRadians(ang));
+    }
+    
+    /**
+     * Set the Speed of this entity
+     * 
+     * @param ang The speed of this entity (pixels/sec)
+     */
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
 
     /**
      * Get the horizontal speed of this entity
@@ -93,6 +118,24 @@ public abstract class Entity {
      */
     public double getVerticalMovement() {
         return dy;
+    }
+    
+    /**
+     * Get the angle of this entity
+     * 
+     * @return The angle of this entity
+     */
+    public double getAngle() {
+        return this.angle;
+    }
+    
+    /**
+     * Set the Speed of this entity
+     * 
+     * @param ang The speed of this entity (pixels/sec)
+     */
+    public double getSpeed(double speed) {
+        return this.speed;
     }
 
     /**
