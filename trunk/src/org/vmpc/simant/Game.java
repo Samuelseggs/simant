@@ -140,8 +140,10 @@ public class Game extends Canvas {
                     //when the ants nolonger are touching, the flag is again set to 0.
             
             //Move ant
-            ant.setHorizontalMovement(40);
-            ant.setVerticalMovement(15);
+            //ant.setHorizontalMovement(40);
+            //ant.setVerticalMovement(15);
+            ant.setSpeed(10);
+            ant.setAngle(270);
             
             // work out how long its been since the last update, this
 
@@ -188,7 +190,7 @@ public class Game extends Canvas {
             // every other entity. If any of them collide notify 
 
             // both entities that the collision has occured
-
+/*
             for (int p = 0; p < entities.size(); p++) {
                 for (int s = p + 1; s < entities.size(); s++) {
                     Entity me = (Entity) entities.get(p);
@@ -199,7 +201,7 @@ public class Game extends Canvas {
                     }
                 }
             }
-
+*/
             // remove any entity that has been marked for clear up
 
             entities.removeAll(removeList);
