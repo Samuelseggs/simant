@@ -7,7 +7,7 @@ package org.vmpc.simant;
 
 /**
  *
- * @author Vegard
+ * @author Kåre
  */
 public class Test {
 
