@@ -53,6 +53,8 @@ public class Game extends Canvas {
     /** True if game logic needs to be applied this loop, normally as a result of a game event */
     private boolean logicRequiredThisLoop = false;
     
+    private double test = 0;
+    
     private int canvasWidth = 800;
     private int canvasHeight = 600;
 
@@ -163,10 +165,12 @@ public class Game extends Canvas {
                 g.drawString("FPS: " + 1000 / delta + " X: " + ant.getX() + " Y: " + ant.getY(), 2, 20);
             }
             
-            if(ant.getX() > 300) {
-                ant.setAngle(-0.8);
-            }
-
+            
+           // if(ant.getX() > 300) {
+            //    ant.setAngle(-0.8);
+          //  }
+            ant.setAngleDegrees(this.test);
+            this.test++;
             // cycle round asking each entity to move itself
 
             //if (!waitingForKeyPress) {
@@ -268,7 +272,7 @@ public class Game extends Canvas {
     private void initEntities() {
         ant = new AntEntity(this, "ant.jpg", 100, 100);
         entities.add(ant);
-        ant.setSpeed(60);
+        ant.setSpeed(0);
         ant.setAngle(0.4);
     }
     
