@@ -80,29 +80,36 @@ public abstract class Entity {
     public void setVerticalMovement(double dy) {
         this.dy = dy;
     }
-    
+
     /**
      * Set the angle of this entity
      * 
      * @param ang The angle of this entity in degrees
      */
     public void setAngleDegrees(double ang) {
-       this.angle = Math.toRadians(ang);
-       this.dy = Math.sin(Math.toRadians(ang));
-       this.dx = Math.cos(Math.toRadians(ang));
+        this.angle = Math.toRadians(ang);
+        this.dy = Math.sin(Math.toRadians(ang));
+        this.dx = Math.cos(Math.toRadians(ang));
     }
-    
+
+    public void addAngle(double ang) {
+        this.angle += Math.toRadians(ang);
+        this.dy = Math.sin(this.angle);
+        this.dx = Math.cos(this.angle);
+
+    }
+
     /**
      * Set the angle of this entity
      * 
      * @param ang The angle of this entity in radians
      */
     public void setAngle(double ang) {
-       this.angle = ang;
-       this.dy = Math.sin(ang);
-       this.dx = Math.cos(ang);
+        this.angle = ang;
+        this.dy = Math.sin(ang);
+        this.dx = Math.cos(ang);
     }
-    
+
     /**
      * Set the Speed of this entity
      * 
@@ -129,7 +136,7 @@ public abstract class Entity {
     public double getVerticalMovement() {
         return dy;
     }
-    
+
     /**
      * Get the angle of this entity
      * 
@@ -138,7 +145,7 @@ public abstract class Entity {
     public double getAngle() {
         return this.angle;
     }
-    
+
     /**
      * Get the angle of this entity in degrees
      * 
@@ -147,7 +154,7 @@ public abstract class Entity {
     public double getAngleDegrees() {
         return Math.toDegrees(this.angle);
     }
-    
+
     /**
      * Set the Speed of this entity
      * 
@@ -164,11 +171,11 @@ public abstract class Entity {
      */
     public void draw(Graphics2D g) {
         double theta = angle;
-        double thetaX = x + sprite.getWidth()/2;
-        double thetaY = y + sprite.getHeight()/2;
-        g.rotate(theta,thetaX,thetaY);
+        double thetaX = x + sprite.getWidth() / 2;
+        double thetaY = y + sprite.getHeight() / 2;
+        g.rotate(theta, thetaX, thetaY);
         sprite.draw(g, (int) x, (int) y);
-        g.rotate(-theta,thetaX,thetaY);
+        g.rotate(-theta, thetaX, thetaY);
     }
 
     /**
@@ -194,6 +201,55 @@ public abstract class Entity {
      */
     public int getY() {
         return (int) y;
+    }
+
+    //didnt know how to call AntEntity functions :D
+    public boolean getKnowFood() {
+        return false;
+    }
+
+    public double getFoodX() {
+        return 0;
+    }
+
+    public double getFoodY() {
+        return 0;
+    }
+    public void foodIncrease() {
+    }
+    public boolean foodDecrease() {
+        return true;
+    }
+    public int getFoodAmount() {
+        return 0; 
+    }
+            
+
+    /**
+     * Get the angle between the Entity and a given location
+     * @param The x coordinate of the target
+     * @param The y coordinate of the target
+     * @return The Angle in radians
+     */
+    protected double calcAngle(double x, double y) {
+        x -= (double) this.getX();
+        y -= (double) this.getY();
+        if (x==0.0 && y==0.0)
+              return 0;
+        else if (x != 0.0) {
+            double ang = Math.atan2(y,x);
+            if (ang < 0)
+                ang+= Math.PI*2;
+            
+            return ang;
+        } else {
+            if (y > 0.0) {
+                return Math.PI / 2;
+            } else {
+                return Math.PI * 1.5;
+            }
+        }
+        
     }
 
     /**
