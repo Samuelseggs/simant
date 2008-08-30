@@ -97,7 +97,8 @@ public class AntEntity extends Entity {
                    // this.iKnowFood = true; //removed because ants tend to lie.. and lies spread like fire in dry grass troughout the ant community :'<
                     this.setAngle(this.calcAngle((double) this.foodX, (double) this.foodY));
                 } else {
-                    this.addAngle(100);
+                    this.addAngle(other.getAngleDegrees()-this.getAngleDegrees()+40);
+                    
                 }
             }
         } else if (other instanceof HomeEntity) {
@@ -118,7 +119,7 @@ public class AntEntity extends Entity {
                     this.carryFood = true;
                 }
             }
-            //usercode //function got the argument boolean FoodLeft...or smth
+            //usercode
             if (this.carryFood) {
                 this.iKnowFood = true;
                 this.foodX = other.getX();
@@ -129,6 +130,8 @@ public class AntEntity extends Entity {
                 this.iKnowFood = false;
             }
         }
+        
+        //destination boolean variable? 
         //other user commands:
         //getDistanceBetweenCoords();
         //some standard variables like "iKnowFood"

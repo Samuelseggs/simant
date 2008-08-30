@@ -92,6 +92,7 @@ public abstract class Entity {
         this.dx = Math.cos(Math.toRadians(ang));
     }
 
+    //it's in degrees now sorry, got to be changed
     public void addAngle(double ang) {
         this.angle += Math.toRadians(ang);
         this.dy = Math.sin(this.angle);
