@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -67,7 +68,6 @@ public class Game extends Canvas {
     public int homeX = 50;
     public int homeY = 50;
     public ArrayList<Boolean> collisions = new ArrayList();
-    
     long lastLoopTime;
     // True if the game has been paused by user (or event)
     private boolean gamePaused = false;
@@ -88,6 +88,8 @@ public class Game extends Canvas {
         setBounds(0, 0, canvasWidth, canvasHeight);
         panel.add(this);
 
+
+
         // Tell AWT not to bother repainting our canvas since we're
 
         // going to do that our self in accelerated mode
@@ -105,6 +107,7 @@ public class Game extends Canvas {
 
         container.addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
             }
@@ -134,7 +137,12 @@ public class Game extends Canvas {
     }
 
     public void gameLoop() {
-        
+        double frameTimeStart;
+        double frameTimeEnd;
+        double frameTime = 0;
+        int frameTimeCalculateEveryFrame = 5;
+        int frameTimeCalculated;
+
         double lastFrameRateTime = System.currentTimeMillis();
         double lastFrameRate = 0;
         ArrayList<Long> frameRates = new ArrayList();
@@ -142,11 +150,12 @@ public class Game extends Canvas {
         double checkFrameRateEveryMilli = 250;
         double deltaFrameRate;
         long delta;
-        
+
         lastLoopTime = System.currentTimeMillis();
-        
+
         // keep looping round til the game ends
         while (gameRunning) {
+            frameTimeStart = System.nanoTime();
 
             //1: move ants
 
@@ -171,15 +180,16 @@ public class Game extends Canvas {
                 deltaFrameRate = System.currentTimeMillis() - lastFrameRateTime;
                 lastLoopTime = System.currentTimeMillis();
 
+                //NANO 10 000
+
                 // Get hold of a graphics context for the accelerated 
-
                 // surface and blank it out
-
                 Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
 
                 // Set the graphics to use a bicbic filter
                 g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                         RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                //NANO 30 000
 
                 // Set the background color and fill the background
                 g.setColor(Color.GREEN);
@@ -189,6 +199,8 @@ public class Game extends Canvas {
                 if (delta > 0) {
                     frameRates.add(1000 / delta);
                 }
+                //NANO 50 000
+
                 //Check if it is about time to calculate the average framerate
                 if (deltaFrameRate > checkFrameRateEveryMilli) {
                     double frameRateTotal = 0;
@@ -207,6 +219,7 @@ public class Game extends Canvas {
                     frameRate = lastFrameRate;
                 }
 
+                //NANO 50 000 ~ 100 000
                 //if (!waitingForKeyPress) {
                 /** Loop trough our entities **/
                 for (int i = 0; i < entities.size(); i++) {
@@ -243,8 +256,11 @@ public class Game extends Canvas {
                         entity.doLogic();
                     }
                 }
+                //NANO 12 000 000
                 logicRequiredThisLoop = false;
 
+                frameTimeEnd = System.nanoTime();
+                frameTime = frameTimeEnd - frameTimeStart;
 
                 // remove any entity that has been marked for clear up
                 entities.removeAll(removeList);
@@ -252,7 +268,10 @@ public class Game extends Canvas {
 
                 /** Draw stats  **/
                 g.setColor(Color.black);
+
+                //NANO 15 000 000
                 g.drawString("FPS: " + (int) frameRate, 2, 20);
+                g.drawString("FrameTime: " + frameTime, 60, 20);
                 g.drawString("Food: " + home.getFoodAmount() + " units.", 2, 40);
                 g.drawString("Food left: " + food.getFoodAmount() + " units", food.getX(), food.getY() - 5);
                 g.drawString("Food left: " + food2.getFoodAmount() + " units", food2.getX(), food2.getY() - 5);
@@ -261,7 +280,7 @@ public class Game extends Canvas {
                 g.dispose();
                 strategy.show();
 
-
+            //NANO 17 ~ 20 000 000
             // brute force collisions, compare every entity against
             // every other entity. If any of them collide notify 
             // both entities that the collision has occured
@@ -319,12 +338,13 @@ public class Game extends Canvas {
             // 100 fps but on windows this might vary each loop due to
             // a bad implementation of timer
             }
+
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+        //NANO 18 ~ 20 000 000
         }
     }
 
@@ -332,9 +352,10 @@ public class Game extends Canvas {
 
         @Override
         public void mousePressed(MouseEvent mouse) {
-            //System.out.println("Mouse pressed at: " + mouse.getX() + " " + mouse.getY());
+            System.out.println("Mouse pressed at: " + mouse.getX() + " " + mouse.getY());
             if (!gamePaused) {
             // Get the selected element and place it on the map
+
             }
         }
     }
