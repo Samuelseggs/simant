@@ -6,27 +6,24 @@ osv.
 
 
 We're starting out with 50 braindead ants.
-If they come across food, they pick it up.
-If they go past their home, they'll drop it off.
+- If they come across food, they pick it up.
+- If they go past their home, they'll drop it off.
 
-Now our task will be to help these poor ants.
-And we will do it by improving their brains.
-The only problem is that our ants minds are somewhat limited,
-and so are their braincapacity.
-So we will be limited to program events in their brains, triggered by their suroundings.
+Now our task will be to help these poor ants,and we will do it by "improving their brains".
+Limited by the ants braincapacity we're set to program events in their brains, triggered by their suroundings.
 
 First off we will help them return the food faster.
 Luckily for us the ants always know where they are, and they always know where they live.
 The sad part is that they aren't clever enough to return their food home when they first have it.
 So what we will do now is to tell them to go home whenever they come across some food.
 
-Each time an ant comes across food the FoodEvent is triggered. This is where we will be adding our code.
-As you can see in the righthand list, we have a "function" named GetAnlgeTo(coordinate)
+Each time an ant comes across food, the FoodEvent is triggered. This is where we will be adding our code.
+As you can see in the righthand list, we have a "function" named GetAnlgeTo(<coordinate>)
 This function will return us the angle to well, a coordinate. In this case we will use it to get the angle 
 to the ants home. As you also see in the list, we have a variable called homeCoordinate, this is of course
 the coordinate of the ants home. So if we call the function GetAngleTo(homeCoordinate) it will return us
 the angle(!) to our home. Now what we'll have to do is to tell the ant to walk in that angle.
-We do this by calling the function SetAngle(coordinate). And in this case our angle is the result of GetAngleTo(homecoordinate).
+We do this by calling the function SetAngle(<angle>). And in this case our angle is the result of GetAngleTo(homeCoordinate).
 So that means our event will look exactly as this:
 
 SetAngle( GetAngleTo(homeCoordinate) );
@@ -36,11 +33,7 @@ SetAngle( GetAngleTo(homeCoordinate) );
 
 
 
-
-
-
-Merk: Etter min mening burde det alltid være en liste på siden av skriptevinduet 
-med tilgjengelige funksjoner og variabler da man skripter de forskjellige eventsene.
+Merk:   Etter min mening burde det alltid være en liste på siden av skriptevinduet med tilgjengelige funksjoner og variabler i det gitte eventet.
 
 
 
