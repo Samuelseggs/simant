@@ -9,6 +9,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -61,8 +65,12 @@ public class Game extends Canvas {
     private int canvasWidth = 800;
     private int canvasHeight = 600;
     public int homeX = 50;
-    public int homeY= 50;
-    public ArrayList<Boolean> collisions= new ArrayList();
+    public int homeY = 50;
+    public ArrayList<Boolean> collisions = new ArrayList();
+    
+    long lastLoopTime;
+    // True if the game has been paused by user (or event)
+    private boolean gamePaused = false;
 
     public Game() {
         // create a frame to contain our game
@@ -93,8 +101,7 @@ public class Game extends Canvas {
         container.setVisible(true);
 
         // add a listener to respond to the user closing the window. If they
-
-        // do we'd like to exit the game
+        // do we'd like to exit the game (and maybe do some other stuff...?)
 
         container.addWindowListener(new WindowAdapter() {
 
@@ -103,32 +110,31 @@ public class Game extends Canvas {
             }
         });
 
+        // add a mouse listener to the game (defined further down)
+
+        addMouseListener(new MouseInputHandler());
+
         // add a key input system (defined below) to our canvas
-
         // so we can respond to key pressed
-
-        //addKeyListener(new KeyInputHandler());
+        addKeyListener(new KeyInputHandler());
 
         // request the focus so key events come to us
-
         requestFocus();
 
         // create the buffering strategy which will allow AWT
-
         // to manage our accelerated graphics
 
         createBufferStrategy(2);
         strategy = getBufferStrategy();
 
         // initialise the entities in our game so there's something
-
         // to see at startup
 
         initEntities();
     }
 
     public void gameLoop() {
-        long lastLoopTime = System.currentTimeMillis();
+        
         double lastFrameRateTime = System.currentTimeMillis();
         double lastFrameRate = 0;
         ArrayList<Long> frameRates = new ArrayList();
@@ -136,10 +142,11 @@ public class Game extends Canvas {
         double checkFrameRateEveryMilli = 250;
         double deltaFrameRate;
         long delta;
+        
+        lastLoopTime = System.currentTimeMillis();
+        
         // keep looping round til the game ends
-
         while (gameRunning) {
-
 
             //1: move ants
 
@@ -156,104 +163,103 @@ public class Game extends Canvas {
 
             // will be used to calculate how far the entities should
 
-            // move this loop
 
-            delta = System.currentTimeMillis() - lastLoopTime;
-            deltaFrameRate = System.currentTimeMillis() - lastFrameRateTime;
-            lastLoopTime = System.currentTimeMillis();
+            if (!gamePaused) {
+                // move this loop
 
-            // Get hold of a graphics context for the accelerated 
+                delta = System.currentTimeMillis() - lastLoopTime;
+                deltaFrameRate = System.currentTimeMillis() - lastFrameRateTime;
+                lastLoopTime = System.currentTimeMillis();
 
-            // surface and blank it out
+                // Get hold of a graphics context for the accelerated 
 
-            Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+                // surface and blank it out
 
-            // Set the graphics to use a bicbic filter
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
 
-            // Set the background color and fill the background
-            g.setColor(Color.GREEN);
-            g.fillRect(0, 0, canvasWidth, canvasHeight);
+                // Set the graphics to use a bicbic filter
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
-            //Add a framerate to the list of frames if the delta is not 0
-            if (delta > 0) {
-                frameRates.add(1000 / delta);
-            }
-            //Check if it is about time to calculate the average framerate
-            if (deltaFrameRate > checkFrameRateEveryMilli) {
-                double frameRateTotal = 0;
-                // Sum all measured framerates
-                for (double aFrameRate : frameRates) {
-                    frameRateTotal += aFrameRate;
+                // Set the background color and fill the background
+                g.setColor(Color.GREEN);
+                g.fillRect(0, 0, canvasWidth, canvasHeight);
+
+                //Add a framerate to the list of frames if the delta is not 0
+                if (delta > 0) {
+                    frameRates.add(1000 / delta);
                 }
-                //Get the average framerate
-                frameRate = frameRateTotal / frameRates.size();
-                //Get ready for new measurements
-                frameRates.clear();
-                lastFrameRate = frameRate;
-                lastFrameRateTime = System.currentTimeMillis();
-
-            } else {
-                frameRate = lastFrameRate;
-            }
-
-            //if (!waitingForKeyPress) {
-            
-
-            /** Loop trough our entities **/
-            for (int i = 0; i < entities.size(); i++) {
-                Entity entity = (Entity) entities.get(i);
-
-                //move the entity
-                entity.move(delta);
-
-                //draw the entity
-                entity.draw(g);
-
-                //brutefoce collisions
-                for (int s = i + 1; s < entities.size(); s++) {
-                    Entity me = (Entity) entities.get(i);
-                    Entity him = (Entity) entities.get(s);
-                    if (me.collidesWith(him)) {
-                       if (!collisions.get(entities.size()*i+s)) {
-                            me.collidedWith(him);
-                            him.collidedWith(me);  
-                            collisions.set(entities.size()*i+s,true);
-                        }        
-                    } else {
-                        collisions.set(entities.size()*i+s,false);
+                //Check if it is about time to calculate the average framerate
+                if (deltaFrameRate > checkFrameRateEveryMilli) {
+                    double frameRateTotal = 0;
+                    // Sum all measured framerates
+                    for (double aFrameRate : frameRates) {
+                        frameRateTotal += aFrameRate;
                     }
+                    //Get the average framerate
+                    frameRate = frameRateTotal / frameRates.size();
+                    //Get ready for new measurements
+                    frameRates.clear();
+                    lastFrameRate = frameRate;
+                    lastFrameRateTime = System.currentTimeMillis();
+
+                } else {
+                    frameRate = lastFrameRate;
+                }
+
+                //if (!waitingForKeyPress) {
+                /** Loop trough our entities **/
+                for (int i = 0; i < entities.size(); i++) {
+                    Entity entity = (Entity) entities.get(i);
+
+                    //move the entity
+                    entity.move(delta);
+
+                    //draw the entity
+                    entity.draw(g);
+
+                    //brutefoce collisions
+                    for (int s = i + 1; s < entities.size(); s++) {
+                        Entity me = (Entity) entities.get(i);
+                        Entity him = (Entity) entities.get(s);
+                        if (me.collidesWith(him)) {
+                            if (!collisions.get(entities.size() * i + s)) {
+                                me.collidedWith(him);
+                                him.collidedWith(me);
+                                collisions.set(entities.size() * i + s, true);
+                            }
+                        } else {
+                            collisions.set(entities.size() * i + s, false);
+                        }
                     //Ye, half of the array slots stay unused...I know.
                     //but I'll fix it later when i got Inet and can check how to
                     //make a "normal" array in java :=)
+                    }
+
+                    // if a game event has indicated that game logic should
+                    // be resolved, cycle round every entity requesting that
+                    // their personal logic should be considered.
+                    if (logicRequiredThisLoop) {
+                        entity.doLogic();
+                    }
                 }
-
-                // if a game event has indicated that game logic should
-                // be resolved, cycle round every entity requesting that
-                // their personal logic should be considered.
-                if (logicRequiredThisLoop) {
-                    entity.doLogic();
-                }
-            }
-            logicRequiredThisLoop = false;
+                logicRequiredThisLoop = false;
 
 
-           // remove any entity that has been marked for clear up
-            entities.removeAll(removeList);
-            removeList.clear();
+                // remove any entity that has been marked for clear up
+                entities.removeAll(removeList);
+                removeList.clear();
 
-
-            /** Draw stats  **/
-            g.setColor(Color.black);
-            g.drawString("FPS: " + (int) frameRate, 2, 20);
-            g.drawString("Food: " + home.getFoodAmount() + " units.", 2, 40);
-            g.drawString("Food left: " + food.getFoodAmount() + " units",food.getX(),food.getY() - 5);
-            g.drawString("Food left: " + food2.getFoodAmount() + " units",food2.getX(),food2.getY() - 5);
-            // finally, we've completed drawing so clear up the graphics
-            // and flip the buffer over
-            g.dispose();
-            strategy.show();
+                /** Draw stats  **/
+                g.setColor(Color.black);
+                g.drawString("FPS: " + (int) frameRate, 2, 20);
+                g.drawString("Food: " + home.getFoodAmount() + " units.", 2, 40);
+                g.drawString("Food left: " + food.getFoodAmount() + " units", food.getX(), food.getY() - 5);
+                g.drawString("Food left: " + food2.getFoodAmount() + " units", food2.getX(), food2.getY() - 5);
+                // finally, we've completed drawing so clear up the graphics
+                // and flip the buffer over
+                g.dispose();
+                strategy.show();
 
 
             // brute force collisions, compare every entity against
@@ -261,17 +267,16 @@ public class Game extends Canvas {
             // both entities that the collision has occured
 /*
             for (int p = 0; p < entities.size(); p++) {
-                for (int s = p + 1; s < entities.size(); s++) {
-                    Entity me = (Entity) entities.get(p);
-                    Entity him = (Entity) entities.get(s);
-                    if (me.collidesWith(him)) {
-                        me.collidedWith(him);
-                        him.collidedWith(me);
-                    }
-                }
+            for (int s = p + 1; s < entities.size(); s++) {
+            Entity me = (Entity) entities.get(p);
+            Entity him = (Entity) entities.get(s);
+            if (me.collidesWith(him)) {
+            me.collidedWith(him);
+            him.collidedWith(me);
             }
-
-*/
+            }
+            }
+             */
             // if a game event has indicated that game logic should
             // be resolved, cycle round every entity requesting that
             // their personal logic should be considered.
@@ -313,10 +318,37 @@ public class Game extends Canvas {
 
             // 100 fps but on windows this might vary each loop due to
             // a bad implementation of timer
+            }
             try {
                 Thread.sleep(10);
             } catch (Exception e) {
-                //Do nothing
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private class MouseInputHandler extends MouseAdapter {
+
+        @Override
+        public void mousePressed(MouseEvent mouse) {
+            //System.out.println("Mouse pressed at: " + mouse.getX() + " " + mouse.getY());
+            if (!gamePaused) {
+            // Get the selected element and place it on the map
+            }
+        }
+    }
+
+    private class KeyInputHandler extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent key) {
+            if (key.getKeyCode() == KeyEvent.VK_P) {
+                gamePaused = !gamePaused;
+                lastLoopTime = System.currentTimeMillis();
+            }
+            if (!gamePaused) {
+
             }
         }
     }
@@ -332,12 +364,12 @@ public class Game extends Canvas {
         entities.add(home);
         home.setSpeed(0);
         home.setAngleDegrees(0);
-        
+
         food = new FoodEntity(this, "food.png", 650, 500);
         entities.add(food);
         food.setSpeed(0);
         food.setAngleDegrees(0);
-        
+
         food2 = new FoodEntity(this, "food.png", 500, 200);
         entities.add(food2);
         food2.setSpeed(0);
@@ -345,20 +377,20 @@ public class Game extends Canvas {
 
         //adding more ants..
         for (int x = 1; x < 50; x++) {
-            Entity entity = new AntEntity(this, "maur2.png", home.getX()+20, home.getY()+20);
+            Entity entity = new AntEntity(this, "maur2.png", home.getX() + 20, home.getY() + 20);
             entities.add(entity);
             entity.setSpeed(40 + x);
             entity.setAngleDegrees(1 + x * 7 * Math.random());
         }
 //        //nvm
-        maursluker = new AntEntity(this, "maur.png",home.getX()+20, home.getY()+20);
+        maursluker = new AntEntity(this, "maur.png", home.getX() + 20, home.getY() + 20);
         entities.add(maursluker);
         maursluker.setSpeed(100);
         maursluker.setAngleDegrees(45);
 //        
 //        collisions test.. will change this later
-        collisions.ensureCapacity(entities.size()*entities.size());
-        for (int i = 0; i<entities.size()*entities.size();i++) {
+        collisions.ensureCapacity(entities.size() * entities.size());
+        for (int i = 0; i < entities.size() * entities.size(); i++) {
             collisions.add(true);
         }
 
