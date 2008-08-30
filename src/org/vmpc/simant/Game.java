@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author svenni
+ * @author svenni (og Vegard :-])
  */
 public class Game extends Canvas {
 
@@ -67,7 +67,7 @@ public class Game extends Canvas {
     private int canvasHeight = 600;
     public int homeX = 50;
     public int homeY = 50;
-    public ArrayList<Boolean> collisions = new ArrayList();
+    public boolean collArray[];
     long lastLoopTime;
     // True if the game has been paused by user (or event)
     private boolean gamePaused = false;
@@ -222,6 +222,7 @@ public class Game extends Canvas {
                 //NANO 50 000 ~ 100 000
                 //if (!waitingForKeyPress) {
                 /** Loop trough our entities **/
+                int collisionSlot = 0;
                 for (int i = 0; i < entities.size(); i++) {
                     Entity entity = (Entity) entities.get(i);
 
@@ -236,17 +237,15 @@ public class Game extends Canvas {
                         Entity me = (Entity) entities.get(i);
                         Entity him = (Entity) entities.get(s);
                         if (me.collidesWith(him)) {
-                            if (!collisions.get(entities.size() * i + s)) {
+                            if (!collArray[collisionSlot]) {
                                 me.collidedWith(him);
                                 him.collidedWith(me);
-                                collisions.set(entities.size() * i + s, true);
+                               collArray[collisionSlot]=true;
                             }
                         } else {
-                            collisions.set(entities.size() * i + s, false);
+                          collArray[collisionSlot]=false;
                         }
-                    //Ye, half of the array slots stay unused...I know.
-                    //but I'll fix it later when i got Inet and can check how to
-                    //make a "normal" array in java :=)
+                        collisionSlot++;
                     }
 
                     // if a game event has indicated that game logic should
@@ -407,15 +406,14 @@ public class Game extends Canvas {
         maursluker = new AntEntity(this, "maur.png", home.getX() + 20, home.getY() + 20);
         entities.add(maursluker);
         maursluker.setSpeed(100);
-        maursluker.setAngleDegrees(45);
-//        
-//        collisions test.. will change this later
-        collisions.ensureCapacity(entities.size() * entities.size());
-        for (int i = 0; i < entities.size() * entities.size(); i++) {
-            collisions.add(true);
+        maursluker.setAngleDegrees(45); 
+
+        //This array makes sure we dont trigger events more than once when we have a collision
+        collArray = new boolean[(int) (0.5*(entities.size()*entities.size()+entities.size()))];
+        for (int a = 0; a < (int) 0.5*(entities.size()*entities.size()+entities.size());a++) {
+            collArray[a]=true;
         }
-
-
+        
     }
 
     //get size of canvas
