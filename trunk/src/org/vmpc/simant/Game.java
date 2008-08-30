@@ -137,8 +137,8 @@ public class Game extends Canvas {
     }
 
     public void gameLoop() {
-        double frameTimeStart;
-        double frameTimeEnd;
+        double frameTimeStart= 0;
+        double frameTimeEnd = 0;
         double frameTime = 0;
         int frameTimeCalculateEveryFrame = 5;
         int frameTimeCalculated;
@@ -410,9 +410,6 @@ public class Game extends Canvas {
 
         //This array makes sure we dont trigger events more than once when we have a collision
         collArray = new boolean[(int) (0.5*(entities.size()*entities.size()+entities.size()))];
-        for (int a = 0; a < (int) 0.5*(entities.size()*entities.size()+entities.size());a++) {
-            collArray[a]=true;
-        }
         
     }
 
