@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.*;
 import com.sun.opengl.util.*;
+import com.sun.opengl.util.j2d.TextRenderer;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
@@ -80,9 +81,16 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     private GLCanvas canvas;
     TextureLoader textureLoader;
     static Frame frame;
+    private TextRenderer textRenderer;
 
     public static void main(String[] args) {
-
+// set the properties of our openGL component...
+        GLCapabilities glCaps = new GLCapabilities();
+        glCaps.setRedBits(8); // 32 bit color resolution
+        glCaps.setBlueBits(8);
+        glCaps.setGreenBits(8);
+        glCaps.setAlphaBits(8);
+        glCaps.setDoubleBuffered(true); // double buffered
         frame = new Frame("SimAnt");
         GLCanvas canvas = new GLCanvas();
 
@@ -196,9 +204,9 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 
         gl.glOrtho(0, width, height, 0, -1, 1);
     }
-    //Probably the game loop
+    //The main game loop
     public void display(GLAutoDrawable drawable) {
-        if(lastLoopTime == 0) {
+        if (lastLoopTime == 0) {
             lastLoopTime = System.nanoTime(); //Looptime has not yet been set, so we need to init it.
         }
         // clear the screen and setup for rendering
@@ -210,10 +218,10 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 
         if (!gamePaused) {
             // move this loop
-            delta =  (System.nanoTime() - lastLoopTime) / 1000000; //Delta is supposed to be in milliseconds
-           // System.out.println("Delta: " + delta);
+            delta = (System.nanoTime() - lastLoopTime) / 1000000; //Delta is supposed to be in milliseconds
+            // System.out.println("Delta: " + delta);
             deltaFrameRate = (System.nanoTime() - lastFrameRateTime) / 1000000;
-           // System.out.println("Delta: " + deltaFrameRate);
+            // System.out.println("Delta: " + deltaFrameRate);
             lastLoopTime = System.nanoTime();
 
             //Add a framerate to the list of frames if the delta is not 0

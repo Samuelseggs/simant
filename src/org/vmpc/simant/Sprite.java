@@ -79,10 +79,11 @@ public class Sprite {
         texture.bind(gl);
         // translate to the right location and prepare to draw
         gl.glTranslatef(x, y, 0);
-
-        gl.glRotated(angle, 0.0, 0.0, 1.0); //Rotation does not seem to work properly :S
+        gl.glRotated(angle, 0.0, 0.0, 1.0); //Rotation does not seem to work properly :S And it is supposed to be degrees!
+        //System.out.println("Angle " + angle);
         gl.glColor3f(1, 1, 1);
-
+        gl.glEnable(GL.GL_BLEND); //Enable blending
+        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA); //Enable transparent textures :D
         // draw a quad textured to match the sprite
         gl.glBegin(GL.GL_QUADS);
         {
