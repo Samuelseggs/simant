@@ -178,7 +178,7 @@ public abstract class Entity {
         double thetaY = y + sprite.getHeight() / 2;
         //g.rotate(theta, thetaX, thetaY);
 
-        sprite.draw((int) x, (int) y);
+        sprite.draw((int) x, (int) y, angle);
 
         //g.rotate(-theta, thetaX, thetaY);
     }

@@ -58,7 +58,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     public int homeX = 50;
     public int homeY = 50;
     public boolean collArray[];
-    long lastLoopTime;
+    long lastLoopTime = 0;
     // True if the game has been paused by user (or event)
     private boolean gamePaused = false;
     // Variables from gameloop
@@ -67,11 +67,11 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     double frameTime = 0;
     int frameTimeCalculateEveryFrame = 5;
     int frameTimeCalculated;
-    double lastFrameRateTime = System.currentTimeMillis();
+    double lastFrameRateTime = System.nanoTime();
     double lastFrameRate = 0;
     ArrayList<Long> frameRates = new ArrayList();
     double frameRate;
-    double checkFrameRateEveryMilli = 250;
+    double checkFrameRateEveryMilli = 2500;
     double deltaFrameRate;
     long delta;
     //GL vars
@@ -79,16 +79,18 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     private GL gl;
     private GLCanvas canvas;
     TextureLoader textureLoader;
+    static Frame frame;
 
     public static void main(String[] args) {
 
-        Frame frame = new Frame("SimAnt");
+        frame = new Frame("SimAnt");
         GLCanvas canvas = new GLCanvas();
 
         canvas.addGLEventListener(new GameGL());
         frame.add(canvas);
         frame.setSize(canvasWidth, canvasHeight);
         final Animator animator = new Animator(canvas);
+
         frame.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -196,26 +198,27 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     }
     //Probably the game loop
     public void display(GLAutoDrawable drawable) {
-
-
+        if(lastLoopTime == 0) {
+            lastLoopTime = System.nanoTime(); //Looptime has not yet been set, so we need to init it.
+        }
         // clear the screen and setup for rendering
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
 
-        lastLoopTime = System.currentTimeMillis();
-
         frameTimeStart = System.nanoTime();
 
         if (!gamePaused) {
             // move this loop
-            delta = System.currentTimeMillis() - lastLoopTime;
-            deltaFrameRate = System.currentTimeMillis() - lastFrameRateTime;
-            lastLoopTime = System.currentTimeMillis();
+            delta =  (System.nanoTime() - lastLoopTime) / 1000000; //Delta is supposed to be in milliseconds
+           // System.out.println("Delta: " + delta);
+            deltaFrameRate = (System.nanoTime() - lastFrameRateTime) / 1000000;
+           // System.out.println("Delta: " + deltaFrameRate);
+            lastLoopTime = System.nanoTime();
 
             //Add a framerate to the list of frames if the delta is not 0
             if (delta > 0) {
-                frameRates.add(1000 / delta);
+                frameRates.add(1000 / delta); //Convert to seconds
             }
             //Get the average framerate
             //Check if it is about time to calculate the average framerate
@@ -230,7 +233,10 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 //Get ready for new measurements
                 frameRates.clear();
                 lastFrameRate = frameRate;
-                lastFrameRateTime = System.currentTimeMillis();
+                lastFrameRateTime = System.nanoTime();
+
+
+                frame.setTitle("SimAnt (FPS: " + (int) frameRate + " FrameTime: " + frameTime + ")");
             } else {
                 frameRate = lastFrameRate;
             }
@@ -280,7 +286,6 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
             // remove any entity that has been marked for clear up
             entities.removeAll(removeList);
             removeList.clear();
-
         /** Draw stats  **
         g.setColor(Color.black);
         //NANO 15 000 000
@@ -303,6 +308,8 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 //            }
         }
 
+
+        lastLoopTime = System.nanoTime();
 
         // flush the graphics commands to the card
         gl.glFlush();
