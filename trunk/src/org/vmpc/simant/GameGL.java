@@ -167,7 +167,9 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     }
 
     public void init(GLAutoDrawable drawable) {
-// Create the background texture
+        //Create the textrenderer
+        textRenderer = new TextRenderer(new Font("SansSerif", Font.PLAIN, 10));
+        // Create the background texture
         BufferedImage bgImage = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = bgImage.createGraphics();
         g.setColor(new Color(0.3f, 0.3f, 0.3f));
@@ -230,13 +232,16 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
             lastLoopTime = System.nanoTime(); //Looptime has not yet been set, so we need to init it.
         }
         //Cap the FPS at 100 FPS
-        if (System.nanoTime() - lastLoopTime  > (1.0E9 / frameRateCap)) { //If the last loop would make the frameRate too high, this would be false
+        if (System.nanoTime() - lastLoopTime > (1.0E9 / frameRateCap)) { //If the last loop would make the frameRate too high, this would be false
             System.out.println("One sec");
             // clear the screen and setup for rendering
             gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glLoadIdentity();
 
+
+
+            /*
             // Draw the background texture
             backgroundTexture.enable();
             backgroundTexture.bind();
@@ -289,7 +294,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                     lastFrameRateTime = System.nanoTime();
 
 
-                    frame.setTitle("SimAnt (FPS: " + (int) frameRate + " FrameTime: " + frameTime + ")");
+                    //frame.setTitle("SimAnt (FPS: " + (int) frameRate + " FrameTime: " + frameTime + ")");
                 } else {
                     frameRate = lastFrameRate;
                 }
@@ -339,18 +344,14 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 // remove any entity that has been marked for clear up
                 entities.removeAll(removeList);
                 removeList.clear();
-            /** Draw stats  **
-            g.setColor(Color.black);
-            //NANO 15 000 000
-            g.drawString("FPS: " + (int) frameRate, 2, 20);
-            g.drawString("FrameTime: " + frameTime, 60, 20);
-            g.drawString("Food: " + home.getFoodAmount() + " units.", 2, 40);
-            g.drawString("Food left: " + food.getFoodAmount() + " units", food.getX(), food.getY() - 5);
-            g.drawString("Food left: " + food2.getFoodAmount() + " units", food2.getX(), food2.getY() - 5);
-            // finally, we've completed drawing so clear up the graphics
-            // and flip the buffer over
-            g.dispose();
-            strategy.show();*/
+                //Render text above everything else
+                textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
+                /** Draw stats  **/
+                textRenderer.draw("FPS: " + (int) frameRate, 2, 20);
+                textRenderer.draw("FrameTime: " + frameTime, 60, 20);
+                textRenderer.draw("Food: " + home.getFoodAmount() + " units.", 2, 40);
+                textRenderer.draw("Food left: " + food.getFoodAmount() + " units", food.getX(), canvasHeight - food.getY() - 5);
+                textRenderer.draw("Food left: " + food2.getFoodAmount() + " units", food2.getX(), canvasHeight - food2.getY() - 5);
             // if a game event has indicated that game logic should
             // be resolved, cycle round every entity requesting that
 //            if (logicRequiredThisLoop) {
@@ -360,7 +361,9 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 //                }
 //            }
             }
-
+            
+            textRenderer.endRendering();
+            //end render text
 
             lastLoopTime = System.nanoTime();
 
