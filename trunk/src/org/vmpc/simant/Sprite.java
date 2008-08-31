@@ -71,7 +71,7 @@ public class Sprite {
      * @param x The x location at which to draw this sprite
      * @param y The y location at which to draw this sprite
      */
-    public void draw(int x, int y) {
+    public void draw(int x, int y, double angle) {
         // store the current model matrix
         gl.glPushMatrix();
 
@@ -79,6 +79,8 @@ public class Sprite {
         texture.bind(gl);
         // translate to the right location and prepare to draw
         gl.glTranslatef(x, y, 0);
+
+        gl.glRotated(angle, 0.0, 0.0, 1.0); //Rotation does not seem to work properly :S
         gl.glColor3f(1, 1, 1);
 
         // draw a quad textured to match the sprite
