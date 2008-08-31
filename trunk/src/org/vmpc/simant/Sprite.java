@@ -70,8 +70,10 @@ public class Sprite {
      * 
      * @param x The x location at which to draw this sprite
      * @param y The y location at which to draw this sprite
+     * @param angle The angle in radians
      */
     public void draw(int x, int y, double angle) {
+        double angleDegrees = Math.toDegrees(angle);
         // store the current model matrix
         gl.glPushMatrix();
 
@@ -79,7 +81,7 @@ public class Sprite {
         texture.bind(gl);
         // translate to the right location and prepare to draw
         gl.glTranslatef(x, y, 0);
-        gl.glRotated(angle, 0.0, 0.0, 1.0); //Rotation does not seem to work properly :S And it is supposed to be degrees!
+        gl.glRotated(angleDegrees, 0.0, 0.0, 1.0); //Rotating around the 0,0,0 axis
         //System.out.println("Angle " + angle);
         gl.glColor3f(1, 1, 1);
         gl.glEnable(GL.GL_BLEND); //Enable blending
@@ -87,14 +89,17 @@ public class Sprite {
         // draw a quad textured to match the sprite
         gl.glBegin(GL.GL_QUADS);
         {
+            // Dividing by two below makes the object have it's origin 
+            // (at least the texture drawn) at [0.5,0.5] instead of [0,0] 
+            // (top left) where [1,1] is the bottom right
             gl.glTexCoord2f(0, 0);
-            gl.glVertex2f(0, 0);
+            gl.glVertex2f(-width / 2, height / 2);
             gl.glTexCoord2f(0, texture.getHeight());
-            gl.glVertex2f(0, height);
+            gl.glVertex2f(-width / 2, -height / 2);
             gl.glTexCoord2f(texture.getWidth(), texture.getHeight());
-            gl.glVertex2f(width, height);
+            gl.glVertex2f(width / 2, -height / 2);
             gl.glTexCoord2f(texture.getWidth(), 0);
-            gl.glVertex2f(width, 0);
+            gl.glVertex2f(width / 2, height / 2);
         }
         gl.glEnd();
 

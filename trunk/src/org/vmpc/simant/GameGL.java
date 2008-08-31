@@ -143,7 +143,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         food2 = new FoodEntity(gl, this, "food.png", 500, 200);
         entities.add(food2);
         food2.setSpeed(0);
-        food2.setAngleDegrees(270);
+        food2.setAngleDegrees(200);
 
         //adding more ants..
         for (int x = 1; x < 50; x++) {
