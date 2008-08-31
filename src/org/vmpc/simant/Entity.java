@@ -2,6 +2,7 @@ package org.vmpc.simant;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import javax.media.opengl.GL;
 
 /**
  * An entity represents any element that appears in the game. The
@@ -44,8 +45,8 @@ public abstract class Entity {
      * @param x The initial x location of this entity
      * @param y The initial y location of this entity
      */
-    public Entity(String ref, int x, int y) {
-        this.sprite = SpriteStore.get().getSprite(ref);
+    public Entity(GL gl, String ref, int x, int y) {
+        this.sprite = new Sprite(gl, ref);
         this.x = x;
         this.y = y;
     }
@@ -61,6 +62,7 @@ public abstract class Entity {
 
         x += (delta * dx * this.speed) / 1000;
         y += (delta * dy * this.speed) / 1000;
+        //System.out.println("X: " + x + "Y:" + y);
     }
 
     /**
@@ -170,13 +172,15 @@ public abstract class Entity {
      * 
      * @param g The graphics context on which to draw
      */
-    public void draw(Graphics2D g) {
+    public void draw() {
         double theta = angle;
         double thetaX = x + sprite.getWidth() / 2;
         double thetaY = y + sprite.getHeight() / 2;
-        g.rotate(theta, thetaX, thetaY);
-        sprite.draw(g, (int) x, (int) y);
-        g.rotate(-theta, thetaX, thetaY);
+        //g.rotate(theta, thetaX, thetaY);
+
+        sprite.draw((int) x, (int) y);
+
+        //g.rotate(-theta, thetaX, thetaY);
     }
 
     /**
@@ -216,15 +220,17 @@ public abstract class Entity {
     public double getFoodY() {
         return 0;
     }
+
     public void foodIncrease() {
     }
+
     public boolean foodDecrease() {
         return true;
     }
+
     public int getFoodAmount() {
-        return 0; 
+        return 0;
     }
-            
 
     /**
      * Get the angle between the Entity and a given location
@@ -235,13 +241,14 @@ public abstract class Entity {
     protected double calcAngle(double x, double y) {
         x -= (double) this.getX();
         y -= (double) this.getY();
-        if (x==0.0 && y==0.0)
-              return 0;
-        else if (x != 0.0) {
-            double ang = Math.atan2(y,x);
-            if (ang < 0)
-                ang+= Math.PI*2;
-            
+        if (x == 0.0 && y == 0.0) {
+            return 0;
+        } else if (x != 0.0) {
+            double ang = Math.atan2(y, x);
+            if (ang < 0) {
+                ang += Math.PI * 2;
+            }
+
             return ang;
         } else {
             if (y > 0.0) {
@@ -250,7 +257,7 @@ public abstract class Entity {
                 return Math.PI * 1.5;
             }
         }
-        
+
     }
 
     /**

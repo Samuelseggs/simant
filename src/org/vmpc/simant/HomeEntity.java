@@ -4,17 +4,19 @@
  */
 package org.vmpc.simant;
 
+import javax.media.opengl.GL;
+
 /**
  *
  * @author Vegard
  */
 public class HomeEntity extends Entity {
 
-    private Game game;
+    private GameGL game;
     public int FoodAmount = 0;
 
-    public HomeEntity(Game game, String ref, int x, int y) {
-        super(ref, x, y);
+    public HomeEntity(GL gl, GameGL game, String ref, int x, int y) {
+        super(gl, ref, x, y);
 
         this.game = game;
     }
