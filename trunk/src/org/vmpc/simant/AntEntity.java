@@ -99,7 +99,7 @@ public class AntEntity extends Entity {
                    // this.iKnowFood = true; //removed because ants tend to lie.. and lies spread like fire in dry grass troughout the ant community :'<
                     this.setAngle(this.calcAngle((double) this.foodX, (double) this.foodY));
                 } else {
-                    this.addAngle(other.getAngleDegrees()-this.getAngleDegrees()+40);
+                    this.addAngleDegrees(other.getAngleDegrees()-this.getAngleDegrees()+40);
                     
                 }
             }
@@ -128,7 +128,7 @@ public class AntEntity extends Entity {
                 this.foodY = other.getY();
                 this.setAngle(this.calcAngle((double) game.homeX, (double) game.homeY));
             } else {
-                this.addAngle(100);
+                this.addAngleDegrees(100);
                 this.iKnowFood = false;
             }
         }

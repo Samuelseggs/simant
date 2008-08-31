@@ -62,7 +62,7 @@ public abstract class Entity {
 
         x += (delta * dx * this.speed) / 1000;
         y += (delta * dy * this.speed) / 1000;
-        //System.out.println("X: " + x + "Y:" + y);
+    //System.out.println("X: " + x + "Y:" + y);
     }
 
     /**
@@ -90,13 +90,20 @@ public abstract class Entity {
      */
     public void setAngleDegrees(double ang) {
         this.angle = Math.toRadians(ang);
-        this.dy = Math.sin(Math.toRadians(ang));
-        this.dx = Math.cos(Math.toRadians(ang));
+        this.dy = Math.sin(this.angle);
+        this.dx = Math.cos(this.angle);
     }
 
     //it's in degrees now sorry, got to be changed
-    public void addAngle(double ang) {
+    public void addAngleDegrees(double ang) {
         this.angle += Math.toRadians(ang);
+        this.dy = Math.sin(this.angle);
+        this.dx = Math.cos(this.angle);
+
+    }
+//it's in degrees now sorry, got to be changed
+    public void addAngle(double ang) {
+        this.angle += ang;
         this.dy = Math.sin(this.angle);
         this.dx = Math.cos(this.angle);
 
@@ -180,7 +187,7 @@ public abstract class Entity {
 
         sprite.draw((int) x, (int) y, angle);
 
-        //g.rotate(-theta, thetaX, thetaY);
+    //g.rotate(-theta, thetaX, thetaY);
     }
 
     /**

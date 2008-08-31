@@ -14,7 +14,7 @@ import javax.media.opengl.GL;
  *
  * @author Kevin Glass
  */
-public class Texture {
+public class TextureGL {
     /** The GL target type */
     private int target; 
     /** The GL texture ID */
@@ -38,7 +38,7 @@ public class Texture {
      * @param target The GL target 
      * @param textureID The GL texture ID
      */
-    public Texture(int target,int textureID) {
+    public TextureGL(int target,int textureID) {
         this.target = target;
         this.textureID = textureID;
     }

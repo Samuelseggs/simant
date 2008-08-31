@@ -86,8 +86,8 @@ public class TextureLoader {
      * @return The loaded texture
      * @throws IOException Indicates a failure to access the resource
      */
-    public Texture getTexture(String resourceName) throws IOException {
-        Texture tex = (Texture) table.get(resourceName);
+    public TextureGL getTexture(String resourceName) throws IOException {
+        TextureGL tex = (TextureGL) table.get(resourceName);
 
         if (tex != null) {
             return tex;
@@ -116,7 +116,7 @@ public class TextureLoader {
      * @return The loaded texture
      * @throws IOException Indicates a failure to access the resource
      */
-    public Texture getTexture(String resourceName,
+    public TextureGL getTexture(String resourceName,
             int target,
             int dstPixelFormat,
             int minFilter,
@@ -125,7 +125,7 @@ public class TextureLoader {
 
         // create the texture ID for this texture 
         int textureID = createTextureID();
-        Texture texture = new Texture(target, textureID);
+        TextureGL texture = new TextureGL(target, textureID);
 
         // bind this texture 
         gl.glBindTexture(target, textureID);
@@ -183,7 +183,7 @@ public class TextureLoader {
      * @param texture The texture to store the data into
      * @return A buffer containing the data
      */
-    private ByteBuffer convertImageData(BufferedImage bufferedImage, Texture texture) {
+    private ByteBuffer convertImageData(BufferedImage bufferedImage, TextureGL texture) {
         ByteBuffer imageBuffer = null;
         WritableRaster raster;
         BufferedImage texImage;
