@@ -147,7 +147,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         food2.setAngleDegrees(200);
 
         //adding more ants..
-        for (int x = 1; x < 50; x++) {
+        for (int x = 1; x < 100; x++) {
             Entity entity = new AntEntity(gl, this, "maur2.png", home.getX() + 20, home.getY() + 20);
             entities.add(entity);
             entity.setSpeed(40 + x);
@@ -233,7 +233,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         }
         //Cap the FPS at 100 FPS
         if (System.nanoTime() - lastLoopTime > (1.0E9 / frameRateCap)) { //If the last loop would make the frameRate too high, this would be false
-            System.out.println("One sec");
+            //System.out.println("One sec");
             // clear the screen and setup for rendering
             gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
             gl.glMatrixMode(GL.GL_MODELVIEW);
