@@ -4,13 +4,15 @@
  */
 package org.vmpc.simant;
 
+import javax.media.opengl.GL;
+
 /**
  *
  * @author Vegard
  */
 public class FoodEntity extends Entity {
 
-    private Game game;
+    private GameGL game;
     public int coordX = 500;
     public int coordY = 500;
     public int foodAmount = 250;
@@ -29,8 +31,8 @@ public class FoodEntity extends Entity {
     }
     
 
-    public FoodEntity(Game game, String ref, int x, int y) {
-        super(ref, x, y);
+    public FoodEntity(GL gl, GameGL game, String ref, int x, int y) {
+        super(gl, ref, x, y);
 
         this.game = game;
     }

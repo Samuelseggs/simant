@@ -4,6 +4,8 @@
  */
 package org.vmpc.simant;
 
+import javax.media.opengl.GL;
+
 /**
  * The entity that represents the players ship
  * 
@@ -12,7 +14,7 @@ package org.vmpc.simant;
 public class AntEntity extends Entity {
 
     /** The game in which the ship exists */
-    private Game game;
+    private GameGL game;
     public boolean iKnowFood = false;
     public boolean carryFood = false;
     public double foodX = 0;
@@ -26,8 +28,8 @@ public class AntEntity extends Entity {
      * @param x The initial x location of the player's ship
      * @param y The initial y location of the player's ship
      */
-    public AntEntity(Game game, String ref, int x, int y) {
-        super(ref, x, y);
+    public AntEntity(GL gl, GameGL game, String ref, int x, int y) {
+        super(gl, ref, x, y);
 
         this.game = game;
     }
