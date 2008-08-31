@@ -79,6 +79,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     double checkFrameRateEveryMilli = 2500;
     double deltaFrameRate;
     long delta;
+    int frameRateCap = 250;
     //GL vars
     /** The OpenGL content, we use this to access all the OpenGL commands */
     private GL gl;
@@ -228,141 +229,144 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         if (lastLoopTime == 0) {
             lastLoopTime = System.nanoTime(); //Looptime has not yet been set, so we need to init it.
         }
-        // clear the screen and setup for rendering
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glLoadIdentity();
-        /*
-        // Draw the background texture
-        backgroundTexture.enable();
-        backgroundTexture.bind();
-        TextureCoords coords = backgroundTexture.getImageTexCoords();
-        int w = drawable.getWidth();
-        int h = drawable.getHeight();
-        float fw = w / 100.0f;
-        float fh = h / 100.0f;
-        gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
-        gl.glBegin(GL.GL_QUADS);
-        gl.glTexCoord2f(fw * coords.left(), fh * coords.bottom());
-        gl.glVertex3f(0, 0, 0);
-        gl.glTexCoord2f(fw * coords.right(), fh * coords.bottom());
-        gl.glVertex3f(w, 0, 0);
-        gl.glTexCoord2f(fw * coords.right(), fh * coords.top());
-        gl.glVertex3f(w, h, 0);
-        gl.glTexCoord2f(fw * coords.left(), fh * coords.top());
-        gl.glVertex3f(0, h, 0);
-        gl.glEnd();
-        backgroundTexture.disable();
-        
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glLoadIdentity();
-        */
-        
-        if (!gamePaused) {
-            // move this loop
-            delta = (System.nanoTime() - lastLoopTime) / 1000000; //Delta is supposed to be in milliseconds
-            // System.out.println("Delta: " + delta);
-            deltaFrameRate = (System.nanoTime() - lastFrameRateTime) / 1000000;
-            // System.out.println("Delta: " + deltaFrameRate);
-            lastLoopTime = System.nanoTime();
+        //Cap the FPS at 100 FPS
+        if (System.nanoTime() - lastLoopTime  > (1.0E9 / frameRateCap)) { //If the last loop would make the frameRate too high, this would be false
+            System.out.println("One sec");
+            // clear the screen and setup for rendering
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+            gl.glMatrixMode(GL.GL_MODELVIEW);
+            gl.glLoadIdentity();
 
-            //Add a framerate to the list of frames if the delta is not 0
-            if (delta > 0) {
-                frameRates.add(1000 / delta); //Convert to seconds
-            }
-            //Get the average framerate
-            //Check if it is about time to calculate the average framerate
-            if (deltaFrameRate > checkFrameRateEveryMilli) {
-                double frameRateTotal = 0;
-                // Sum all measured framerates
-                for (double aFrameRate : frameRates) {
-                    frameRateTotal += aFrameRate;
+            // Draw the background texture
+            backgroundTexture.enable();
+            backgroundTexture.bind();
+            TextureCoords coords = backgroundTexture.getImageTexCoords();
+            int w = drawable.getWidth();
+            int h = drawable.getHeight();
+            float fw = w / 100.0f;
+            float fh = h / 100.0f;
+            gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
+            gl.glBegin(GL.GL_QUADS);
+            gl.glTexCoord2f(fw * coords.left(), fh * coords.bottom());
+            gl.glVertex3f(0, 0, 0);
+            gl.glTexCoord2f(fw * coords.right(), fh * coords.bottom());
+            gl.glVertex3f(w, 0, 0);
+            gl.glTexCoord2f(fw * coords.right(), fh * coords.top());
+            gl.glVertex3f(w, h, 0);
+            gl.glTexCoord2f(fw * coords.left(), fh * coords.top());
+            gl.glVertex3f(0, h, 0);
+            gl.glEnd();
+            backgroundTexture.disable();
+            gl.glMatrixMode(GL.GL_MODELVIEW);
+            gl.glLoadIdentity();
+             */
+
+            if (!gamePaused) {
+                // move this loop
+                delta = (System.nanoTime() - lastLoopTime) / 1000000; //Delta is supposed to be in milliseconds
+                // System.out.println("Delta: " + delta);
+                deltaFrameRate = (System.nanoTime() - lastFrameRateTime) / 1000000;
+                // System.out.println("Delta: " + deltaFrameRate);
+                lastLoopTime = System.nanoTime();
+
+                //Add a framerate to the list of frames if the delta is not 0
+                if (delta > 0) {
+                    frameRates.add(1000 / delta); //Convert to seconds
                 }
                 //Get the average framerate
-                frameRate = frameRateTotal / frameRates.size();
-                //Get ready for new measurements
-                frameRates.clear();
-                lastFrameRate = frameRate;
-                lastFrameRateTime = System.nanoTime();
-
-                food.setAngleDegrees(food.getAngleDegrees() + 45);
-                frame.setTitle("SimAnt (FPS: " + (int) frameRate + " FrameTime: " + frameTime + ")");
-            } else {
-                frameRate = lastFrameRate;
-            }
-
-
-            //if (!waitingForKeyPress) {
-            /** Loop trough our entities **/
-            int collisionSlot = 0;
-            for (int i = 0; i < entities.size(); i++) {
-                Entity entity = (Entity) entities.get(i);
-
-                //NANO 50 000 ~ 100 000
-                entity.move(delta);
-
-                //move the entity
-                entity.draw();
-
-                //brutefoce collisions
-                for (int s = i + 1; s < entities.size(); s++) {
-                    Entity me = (Entity) entities.get(i);
-                    Entity him = (Entity) entities.get(s);
-                    if (me.collidesWith(him)) {
-                        if (!collArray[collisionSlot]) {
-                            me.collidedWith(him);
-                            him.collidedWith(me);
-                            collArray[collisionSlot] = true;
-                        }
-                    } else {
-                        collArray[collisionSlot] = false;
+                //Check if it is about time to calculate the average framerate
+                if (deltaFrameRate > checkFrameRateEveryMilli) {
+                    double frameRateTotal = 0;
+                    // Sum all measured framerates
+                    for (double aFrameRate : frameRates) {
+                        frameRateTotal += aFrameRate;
                     }
-                    collisionSlot++;
+                    //Get the average framerate
+                    frameRate = frameRateTotal / frameRates.size();
+                    //Get ready for new measurements
+                    frameRates.clear();
+                    lastFrameRate = frameRate;
+                    lastFrameRateTime = System.nanoTime();
+
+
+                    frame.setTitle("SimAnt (FPS: " + (int) frameRate + " FrameTime: " + frameTime + ")");
+                } else {
+                    frameRate = lastFrameRate;
+                }
+                food.addAngleDegrees(0.5);
+
+                //if (!waitingForKeyPress) {
+                /** Loop trough our entities **/
+                int collisionSlot = 0;
+                for (int i = 0; i < entities.size(); i++) {
+                    Entity entity = (Entity) entities.get(i);
+
+                    //NANO 50 000 ~ 100 000
+                    entity.move(delta);
+
+                    //move the entity
+                    entity.draw();
+
+                    //brutefoce collisions
+                    for (int s = i + 1; s < entities.size(); s++) {
+                        Entity me = (Entity) entities.get(i);
+                        Entity him = (Entity) entities.get(s);
+                        if (me.collidesWith(him)) {
+                            if (!collArray[collisionSlot]) {
+                                me.collidedWith(him);
+                                him.collidedWith(me);
+                                collArray[collisionSlot] = true;
+                            }
+                        } else {
+                            collArray[collisionSlot] = false;
+                        }
+                        collisionSlot++;
+                    }
+
+                    // if a game event has indicated that game logic should
+                    // be resolved, cycle round every entity requesting that
+                    // their personal logic should be considered.
+                    if (logicRequiredThisLoop) {
+                        entity.doLogic();
+                    }
                 }
 
-                // if a game event has indicated that game logic should
-                // be resolved, cycle round every entity requesting that
-                // their personal logic should be considered.
-                if (logicRequiredThisLoop) {
-                    entity.doLogic();
-                }
-            }
+                logicRequiredThisLoop = false;
 
-            logicRequiredThisLoop = false;
+                frameTimeEnd = System.nanoTime();
+                frameTime = frameTimeEnd - frameTimeStart;
 
-            frameTimeEnd = System.nanoTime();
-            frameTime = frameTimeEnd - frameTimeStart;
-
-            // remove any entity that has been marked for clear up
-            entities.removeAll(removeList);
-            removeList.clear();
-        /** Draw stats  **
-        g.setColor(Color.black);
-        //NANO 15 000 000
-        g.drawString("FPS: " + (int) frameRate, 2, 20);
-        g.drawString("FrameTime: " + frameTime, 60, 20);
-        g.drawString("Food: " + home.getFoodAmount() + " units.", 2, 40);
-        g.drawString("Food left: " + food.getFoodAmount() + " units", food.getX(), food.getY() - 5);
-        g.drawString("Food left: " + food2.getFoodAmount() + " units", food2.getX(), food2.getY() - 5);
-        // finally, we've completed drawing so clear up the graphics
-        // and flip the buffer over
-        g.dispose();
-        strategy.show();*/
-        // if a game event has indicated that game logic should
-        // be resolved, cycle round every entity requesting that
+                // remove any entity that has been marked for clear up
+                entities.removeAll(removeList);
+                removeList.clear();
+            /** Draw stats  **
+            g.setColor(Color.black);
+            //NANO 15 000 000
+            g.drawString("FPS: " + (int) frameRate, 2, 20);
+            g.drawString("FrameTime: " + frameTime, 60, 20);
+            g.drawString("Food: " + home.getFoodAmount() + " units.", 2, 40);
+            g.drawString("Food left: " + food.getFoodAmount() + " units", food.getX(), food.getY() - 5);
+            g.drawString("Food left: " + food2.getFoodAmount() + " units", food2.getX(), food2.getY() - 5);
+            // finally, we've completed drawing so clear up the graphics
+            // and flip the buffer over
+            g.dispose();
+            strategy.show();*/
+            // if a game event has indicated that game logic should
+            // be resolved, cycle round every entity requesting that
 //            if (logicRequiredThisLoop) {
 //                for (int i = 0; i < entities.size(); i++) {
 //                    Entity entity = (Entity) entities.get(i);
 //                    
 //                }
 //            }
+            }
+
+
+            lastLoopTime = System.nanoTime();
+
+            // flush the graphics commands to the card
+            gl.glFlush();
         }
-
-
-        lastLoopTime = System.nanoTime();
-
-        // flush the graphics commands to the card
-        gl.glFlush();
         try {
             Thread.sleep(1);
         } catch (InterruptedException ex) {
