@@ -16,7 +16,7 @@ import javax.media.opengl.GL;
 public class Sprite {
 
     /** The texture that stores the image for this sprite */
-    private Texture texture;
+    private TextureGL texture;
     private TextureLoader textureLoader;
     /** The window that this sprite can be drawn in */
     private GL gl;

@@ -8,7 +8,11 @@ import java.util.logging.Logger;
 import javax.media.opengl.*;
 import com.sun.opengl.util.*;
 import com.sun.opengl.util.j2d.TextRenderer;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureCoords;
+import com.sun.opengl.util.texture.TextureIO;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
@@ -82,6 +86,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     TextureLoader textureLoader;
     static Frame frame;
     private TextRenderer textRenderer;
+    private Texture backgroundTexture;
 
     public static void main(String[] args) {
 // set the properties of our openGL component...
@@ -161,7 +166,21 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     }
 
     public void init(GLAutoDrawable drawable) {
-
+// Create the background texture
+        BufferedImage bgImage = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = bgImage.createGraphics();
+        g.setColor(new Color(0.3f, 0.3f, 0.3f));
+        g.fillRect(0, 0, 2, 2);
+        g.setColor(new Color(0.7f, 0.7f, 0.7f));
+        g.fillRect(0, 0, 1, 1);
+        g.fillRect(1, 1, 1, 1);
+        g.dispose();
+        backgroundTexture = TextureIO.newTexture(bgImage, false);
+        backgroundTexture.bind();
+        backgroundTexture.setTexParameteri(GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        backgroundTexture.setTexParameteri(GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        backgroundTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+        backgroundTexture.setTexParameteri(GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
 
         // get hold of the GL content
 
@@ -181,11 +200,11 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     }
     //get size of canvas
     public int getcanvasWidth() {
-        return this.canvasWidth;
+        return GameGL.canvasWidth;
     }
 
     public int getcanvasHeight() {
-        return this.canvasHeight;
+        return GameGL.canvasHeight;
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -213,9 +232,32 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
-
-        frameTimeStart = System.nanoTime();
-
+        /*
+        // Draw the background texture
+        backgroundTexture.enable();
+        backgroundTexture.bind();
+        TextureCoords coords = backgroundTexture.getImageTexCoords();
+        int w = drawable.getWidth();
+        int h = drawable.getHeight();
+        float fw = w / 100.0f;
+        float fh = h / 100.0f;
+        gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
+        gl.glBegin(GL.GL_QUADS);
+        gl.glTexCoord2f(fw * coords.left(), fh * coords.bottom());
+        gl.glVertex3f(0, 0, 0);
+        gl.glTexCoord2f(fw * coords.right(), fh * coords.bottom());
+        gl.glVertex3f(w, 0, 0);
+        gl.glTexCoord2f(fw * coords.right(), fh * coords.top());
+        gl.glVertex3f(w, h, 0);
+        gl.glTexCoord2f(fw * coords.left(), fh * coords.top());
+        gl.glVertex3f(0, h, 0);
+        gl.glEnd();
+        backgroundTexture.disable();
+        
+        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glLoadIdentity();
+        */
+        
         if (!gamePaused) {
             // move this loop
             delta = (System.nanoTime() - lastLoopTime) / 1000000; //Delta is supposed to be in milliseconds
@@ -243,7 +285,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 lastFrameRate = frameRate;
                 lastFrameRateTime = System.nanoTime();
 
-
+                food.setAngleDegrees(food.getAngleDegrees() + 45);
                 frame.setTitle("SimAnt (FPS: " + (int) frameRate + " FrameTime: " + frameTime + ")");
             } else {
                 frameRate = lastFrameRate;
