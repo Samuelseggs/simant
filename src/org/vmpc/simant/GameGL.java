@@ -236,6 +236,10 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         gl.glLoadIdentity();
 
         gl.glOrtho(0, width, height, 0, -1, 1);
+        
+        //Set the new sizes of the canvas (the game)
+        canvasHeight = drawable.getHeight();
+        canvasWidth = drawable.getWidth();
     }
     //The main game loop
     public void display(GLAutoDrawable drawable) {
