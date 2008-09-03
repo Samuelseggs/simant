@@ -19,6 +19,9 @@ public class AntEntity extends Entity {
     public boolean carryFood = false;
     public double foodX = 0;
     public double foodY = 0;
+    public double targetangle = 0;
+    public boolean headingForTarget = false;
+    public boolean guilty = false;
 
     /**
      * Create a new entity to represent the players ship
@@ -40,7 +43,12 @@ public class AntEntity extends Entity {
      * 
      * @param delta The time that has elapsed since last move (ms)
      */
-    public void move(long delta) {
+    public void move(long delta) {  
+        
+        //moved this to the beginning instead of end.
+        super.move(delta);
+        
+        
         // if we're moving left and have reached the left hand side
         // of the screen, jump to the right hand side
         if ((dx < 0) && (x < 0 - sprite.getWidth())) {
@@ -67,9 +75,42 @@ public class AntEntity extends Entity {
             y = 0 - sprite.getHeight();
             return;
         }
+    }
+    public void reverse(long delta) {
+        super.reverse(delta);
+         // if we're moving left and have reached the left hand side
+        // of the screen, jump to the right hand side
+        if ((dx*-1 < 0) && (x < 0 - sprite.getWidth())) {
+            x = game.getcanvasWidth();
+            return;
+        }
 
+        // if we're moving right and have reached the right hand side
+        // of the screen, jump to the left hand side
+        if ((dx*-1 > 0) && (x > game.getcanvasWidth()/* pluss halve størrelsen*/)) {
+            x = 0 - sprite.getWidth();
+            return;
+        }
+        // if we're moving up and have reached the top
+        // of the screen, jump to the bottom
+        if ((dy*-1 < 0) && (y < 0 - sprite.getHeight())) {
+            y = game.getcanvasHeight();
+            return;
+        }
 
-        super.move(delta);
+        // if we're moving down and have reached the bottom
+        // of the screen, jump to the top
+        if ((dy*-1 > 0) && (y > game.getcanvasHeight()/* pluss halve størrelsen*/)) {
+            y = 0 - sprite.getHeight();
+            return;
+        }
+        
+    }
+    public double getTargetAngle() {
+        if (headingForTarget)
+            return targetangle;
+        else
+            return Math.random()* 2.123;
     }
 
     public boolean getKnowFood() {
@@ -83,6 +124,21 @@ public class AntEntity extends Entity {
     public double getFoodY() {
         return this.foodY;
     }
+    public boolean getRound() {
+       return true; //i want round hitboxes for ants (test)
+    }
+    
+    public void recalculateTargetAngle() {
+        if (headingForTarget){
+            if (!carryFood)
+                targetangle = this.calcAngle((double) this.foodX, (double) this.foodY);
+            else
+                targetangle = this.calcAngle((double) game.homeX, (double) game.homeY);
+        }
+    }
+    public void setGuilty(boolean guilt) {
+        guilty=guilt;
+    }
 
     /**
      * Notification that the player's ship has collided with something
@@ -90,19 +146,36 @@ public class AntEntity extends Entity {
      * @param other The entity with which the ship has collided
      */
     public void collidedWith(Entity other) {
+        
         if (other instanceof AntEntity) { //replace content with eventtriggers
-
-            if (!this.iKnowFood) {
-                if (other.getKnowFood()) {
-                    this.foodX = other.getFoodX();
-                    this.foodY = other.getFoodY();
-                   // this.iKnowFood = true; //removed because ants tend to lie.. and lies spread like fire in dry grass troughout the ant community :'<
-                    this.setAngle(this.calcAngle((double) this.foodX, (double) this.foodY));
-                } else {
-                    this.addAngleDegrees(other.getAngleDegrees()-this.getAngleDegrees()+40);
-                    
+            if (!this.headingForTarget) {
+                if (!this.iKnowFood) {
+                    if (other.getKnowFood()) {
+                        this.foodX = other.getFoodX();
+                        this.foodY = other.getFoodY();
+                       // this.iKnowFood = true; //removed because ants tend to lie.. and lies spread like fire in dry grass troughout the ant community :'<
+                        this.headingForTarget=true;
+                        if (game.stepOn)
+                            this.setAngle(this.calcAngle((double) this.foodX, (double) this.foodY));
+                        else {
+                            this.targetangle = this.calcAngle((double) this.foodX, (double) this.foodY);
+                        }
+                    } else {
+                        if (game.stepOn)
+                            this.addAngleDegrees(other.getAngleDegrees()-this.getAngleDegrees()+40);
+                    }
                 }
             }
+           if (!game.stepOn) {
+               if (guilty) {
+                double diff;
+                if ( ( (diff =((this.calcAngle( other.x, other.y)) - this.angle)) > Math.PI ) || ( (diff < 0) && (diff > Math.PI*-1) ) )
+                    this.addAngle(0.2); 
+                else 
+                 this.addAngle(-0.2);
+               }
+
+           }
         } else if (other instanceof HomeEntity) {
             if (this.carryFood) { //auto (not set by the player)
 
@@ -111,9 +184,15 @@ public class AntEntity extends Entity {
             }
             //user code:
             if (this.iKnowFood) {
-                this.setAngle(this.calcAngle((double) this.foodX, (double) this.foodY));
+                if (game.stepOn)
+                    this.setAngle(this.calcAngle((double) this.foodX, (double) this.foodY));
+                else {
+                    this.targetangle = this.calcAngle((double) this.foodX, (double) this.foodY);
+                }
             }
-
+           if (!game.stepOn) {
+                   this.addAngle(-0.5);
+           }
         } else if (other instanceof FoodEntity) {
             if (!this.carryFood) { //auto (not in the event)
 
@@ -124,13 +203,23 @@ public class AntEntity extends Entity {
             //usercode
             if (this.carryFood) {
                 this.iKnowFood = true;
+                this.headingForTarget = true;
                 this.foodX = other.getX();
                 this.foodY = other.getY();
-                this.setAngle(this.calcAngle((double) game.homeX, (double) game.homeY));
+                if (game.stepOn)
+                    this.setAngle(this.calcAngle((double) game.homeX, (double) game.homeY));
+                 else {
+                    this.targetangle = this.calcAngle((double) game.homeX, (double) game.homeY);
+                }
             } else {
-                this.addAngleDegrees(100);
+                if (game.stepOn)
+                    this.addAngleDegrees(100);
                 this.iKnowFood = false;
+                this.headingForTarget = false;
             }
+            if (!game.stepOn) {
+               this.addAngle(-0.5);
+           }
         }
         
         //destination boolean variable? 

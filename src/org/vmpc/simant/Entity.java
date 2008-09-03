@@ -64,6 +64,10 @@ public abstract class Entity {
         y += (delta * dy * this.speed) / 1000;
     //System.out.println("X: " + x + "Y:" + y);
     }
+     public void reverse(long delta) {
+        x -= (delta * dx * this.speed) / 1000;
+        y -= (delta * dy * this.speed) / 1000;
+     }
 
     /**
      * Set the horizontal speed of this entity
@@ -90,6 +94,7 @@ public abstract class Entity {
      */
     public void setAngleDegrees(double ang) {
         this.angle = Math.toRadians(ang);
+        this.anglefix();
         this.dy = Math.sin(this.angle);
         this.dx = Math.cos(this.angle);
     }
@@ -97,6 +102,7 @@ public abstract class Entity {
     //it's in degrees now sorry, got to be changed
     public void addAngleDegrees(double ang) {
         this.angle += Math.toRadians(ang);
+        this.anglefix();
         this.dy = Math.sin(this.angle);
         this.dx = Math.cos(this.angle);
 
@@ -104,10 +110,20 @@ public abstract class Entity {
 //it's in degrees now sorry, got to be changed
     public void addAngle(double ang) {
         this.angle += ang;
+        this.anglefix();
         this.dy = Math.sin(this.angle);
         this.dx = Math.cos(this.angle);
 
     }
+    public void anglefix() {
+            while (this.angle < 0) {
+            this.angle += 2* Math.PI;
+            }
+            while (this.angle > 2*Math.PI) {
+                this.angle -= 2* Math.PI;
+            }
+    }
+          
 
     /**
      * Set the angle of this entity
@@ -116,6 +132,7 @@ public abstract class Entity {
      */
     public void setAngle(double ang) {
         this.angle = ang;
+        this.anglefix();
         this.dy = Math.sin(ang);
         this.dx = Math.cos(ang);
     }
@@ -266,6 +283,17 @@ public abstract class Entity {
         }
 
     }
+    public boolean getRound() {
+        return true; //warning :O! TEST :p
+    }
+    public void recalculateTargetAngle() {
+    }
+    public double getTargetAngle() {
+        return angle;
+    }
+    
+    public void setGuilty(boolean guilt) {
+    }
 
     /**
      * Check if this entity collised with another.
@@ -274,6 +302,64 @@ public abstract class Entity {
      * @return True if the entities collide with each other
      */
     public boolean collidesWith(Entity other) {
+        
+        
+    //introducing circle shaped hitboxes.
+    if (true) {
+        //Even for squares this method should be slightly faster, as they most probably wont intersect anyway.
+        double yDist;
+        double height;
+        double width;
+        double xDist;
+        
+        //if we are in the wrong height for a collision (distance longer than rad+rad)
+        if (( (height=((double)sprite.getHeight()/2)+((double)other.sprite.getHeight()/2)) < (yDist = (y - other.y))) || (height < yDist*-1)) {
+            return false;         
+        }
+        //or too far to the side :)
+        else if (((width=((double)sprite.getWidth()/2)+((double)other.sprite.getWidth()/2)) < (xDist = (x - other.x))) || (width < xDist*-1)) {
+            return false;
+        } 
+        //else if both got square hitboxes we're actually colliding :o|
+        else if (!getRound() && !other.getRound()) {        
+             return true;
+        }
+        //but not necessarily if both got round ones
+        else if (getRound() && other.getRound()) {
+             //if the distance betweeen the two objects is smaller than the two radiuses combined.
+             if (Math.pow(x-other.x,2)+Math.pow(x-other.x,2) < Math.pow((sprite.getWidth()/2)+(other.sprite.getWidth()/2),2) ) //Here i assume that half the sprite width is the radius and the wanted hitbox size.
+                return true;
+             else return false;          
+         }
+        //or if only one got round ones :)
+        else {
+            //moving the imagined square to one corner of the circle, to simplify it for us
+            if (yDist < 0)
+                yDist*= -1;
+            if (xDist < 0)
+                xDist*= -1;
+            // if it crosses the middle of our circle, it hits.
+            if (getRound()) {
+                if ((yDist-=other.sprite.getHeight()/2) <= 0)
+                    return true;
+                else if ((xDist-=other.sprite.getWidth()/2) <= 0)
+                    return true;
+            } else {
+                if ((yDist-=sprite.getHeight()/2) <= 0)
+                    return true;
+                else if ((xDist-=sprite.getWidth()/2) <= 0)
+                    return true;
+            }
+            //and the very last check.       //PS: We need to do the two above checks first, or we might get a false positive.
+            if (Math.pow(x-other.x,2)+Math.pow(x-other.x,2) < Math.pow((sprite.getWidth()/2)+(other.sprite.getWidth()/2),2) )
+                return true;
+            else return false;
+        }
+    }
+        
+        
+        
+        
         me.setBounds((int) x, (int) y, sprite.getWidth(), sprite.getHeight());
         him.setBounds((int) other.x, (int) other.y, other.sprite.getWidth(), other.sprite.getHeight());
 
