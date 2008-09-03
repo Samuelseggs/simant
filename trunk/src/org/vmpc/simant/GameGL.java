@@ -88,6 +88,8 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     static Frame frame;
     private TextRenderer textRenderer;
     private Texture backgroundTexture;
+    public boolean stepOn=true;
+    public int angleCounter = 0; // so not all the ants will recalculate their angles at the same time //together with stepOn==false..
 
     public static void main(String[] args) {
 // set the properties of our openGL component...
@@ -99,11 +101,12 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         glCaps.setDoubleBuffered(true); // double buffered
         frame = new Frame("SimAnt");
         GLCanvas canvas = new GLCanvas();
-
+   
         canvas.addGLEventListener(new GameGL());
         frame.add(canvas);
         frame.setSize(canvasWidth, canvasHeight);
         final Animator animator = new Animator(canvas);
+        
 
         frame.addWindowListener(new WindowAdapter() {
 
@@ -141,28 +144,36 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         food.setSpeed(0);
         food.setAngleDegrees(0);
 
-        food2 = new FoodEntity(gl, this, "food.png", 500, 200);
-        entities.add(food2);
-        food2.setSpeed(0);
-        food2.setAngleDegrees(200);
+//        food2 = new FoodEntity(gl, this, "food.png", 500, 200);
+//        entities.add(food2);
+//        food2.setSpeed(0);
+//        food2.setAngleDegrees(200);
 
         //adding more ants..
-        for (int x = 1; x < 100; x++) {
+        for (int x = 1; x < 50; x++) {
             Entity entity = new AntEntity(gl, this, "maur2.png", home.getX() + 20, home.getY() + 20);
             entities.add(entity);
-            entity.setSpeed(40 + x);
+            entity.setSpeed(40/* + x*/);
             entity.setAngleDegrees(1 + x * 7 * Math.random());
         }
 //        //nvm
         maursluker = new AntEntity(gl, this, "maur.png", home.getX() + 20, home.getY() + 20);
         entities.add(maursluker);
-        maursluker.setSpeed(100);
+        maursluker.setSpeed(40);
         maursluker.setAngleDegrees(45);
 
         //This array makes sure we dont trigger events more than once when we have a collision
-        collArray = new boolean[(int) (0.5 * (entities.size() * entities.size() + entities.size()))];
-        for (int a = 0; a < (int) 0.5 * (entities.size() * entities.size() + entities.size()); a++) {
-            collArray[a] = true;
+        if (stepOn) {
+            collArray = new boolean[(int) (0.5 * (entities.size() * entities.size() + entities.size()))];
+            for (int a = 0; a < (int) 0.5 * (entities.size() * entities.size() + entities.size()); a++) {
+                collArray[a] = true;
+            }
+        } else {
+            collArray = new boolean[entities.size() * entities.size()];
+            for (int a = 0; a < entities.size() * entities.size(); a++) {
+                collArray[a] = true;
+            }
+            
         }
     }
 
@@ -229,17 +240,22 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     //The main game loop
     public void display(GLAutoDrawable drawable) {
         if (lastLoopTime == 0) {
-            lastLoopTime = System.nanoTime(); //Looptime has not yet been set, so we need to init it.
+            lastLoopTime = System.currentTimeMillis(); //Looptime has not yet been set, so we need to init it.
         }
-        //Cap the FPS at 100 FPS
-        if (System.nanoTime() - lastLoopTime > (1.0E9 / frameRateCap)) { //If the last loop would make the frameRate too high, this would be false
+        //Cap the FPS at 100 FPS        Vj notes: Added a while loop up here instead, there's no need to cause more lag than we have to.
+       while (System.currentTimeMillis() - lastLoopTime < (1000 / frameRateCap)) {
+           try {
+                Thread.sleep(0, 1);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GameGL.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+       // if (System.currentTimeMillis() - lastLoopTime > (1000 / frameRateCap)) { //If the last loop would make the frameRate too high, this would be false
             //System.out.println("One sec");
             // clear the screen and setup for rendering
             gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glLoadIdentity();
-
-
 
             /*
             // Draw the background texture
@@ -265,14 +281,16 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glLoadIdentity();
              */
-
+               
             if (!gamePaused) {
                 // move this loop
-                delta = (System.nanoTime() - lastLoopTime) / 1000000; //Delta is supposed to be in milliseconds
+                delta = (System.currentTimeMillis() - lastLoopTime); //Delta is supposed to be in milliseconds
+                lastLoopTime = System.currentTimeMillis();
+                
                 // System.out.println("Delta: " + delta);
-                deltaFrameRate = (System.nanoTime() - lastFrameRateTime) / 1000000;
+                deltaFrameRate = (System.currentTimeMillis() - lastFrameRateTime);
                 // System.out.println("Delta: " + deltaFrameRate);
-                lastLoopTime = System.nanoTime();
+                
 
                 //Add a framerate to the list of frames if the delta is not 0
                 if (delta > 0) {
@@ -291,14 +309,14 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                     //Get ready for new measurements
                     frameRates.clear();
                     lastFrameRate = frameRate;
-                    lastFrameRateTime = System.nanoTime();
+                    lastFrameRateTime = System.currentTimeMillis();
 
 
                     //frame.setTitle("SimAnt (FPS: " + (int) frameRate + " FrameTime: " + frameTime + ")");
                 } else {
                     frameRate = lastFrameRate;
                 }
-                food.addAngleDegrees(0.5);
+                //food.addAngleDegrees(0.5); //grr! :P
 
                 //if (!waitingForKeyPress) {
                 /** Loop trough our entities **/
@@ -312,9 +330,11 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                     //move the entity
                     entity.draw();
 
-                    //brutefoce collisions
+                    //brutefoce collisions //not able to walk trough, move both 1 stage back?.. what happends then if one walks on another from the rear??
+ 
+                   if (stepOn) {
                     for (int s = i + 1; s < entities.size(); s++) {
-                        Entity me = (Entity) entities.get(i);
+                        Entity me = entity;
                         Entity him = (Entity) entities.get(s);
                         if (me.collidesWith(him)) {
                             if (!collArray[collisionSlot]) {
@@ -327,6 +347,50 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                         }
                         collisionSlot++;
                     }
+                   } else { //Yet another Vj test.
+                    for (int s = 0; s < entities.size(); s++) {
+                        if (s==i)
+                            continue;
+                    //should we check every bloody single  ant then?? wouldnt it cause problems with events?? yes :o //go back to multidim. arrays? trigger code, but not script
+                    //always walk to the left when hitting someone, unless youre hit from the rear, then walk right?
+                    //save the wanted angle.. always go one degree back to it if not hit.. go 5 degrees or smth in the other direction if hit.
+                    //if his-my ang norm 90 > x < -90, and he crashed in me, walk left, else walk left. how to see who walks into who?.. placement, and angle?
+                        Entity me = (Entity) entities.get(i);
+                        Entity him = (Entity) entities.get(s);
+                        if (me.collidesWith(him)) {
+                            me.reverse(delta);
+                            
+                            if (me.collidesWith(him)) {
+                                me.move(delta);
+                            } else {
+                            //if (!collArray[collisionSlot]) {
+                                me.setGuilty(true);
+                                him.setGuilty(false);
+                                
+                                me.collidedWith(him);
+                                him.collidedWith(me);
+                            }
+                            
+                               // collArray[collisionSlot] = true;
+                          //  }   
+                        }// else {
+                      //      collArray[collisionSlot] = false;
+                      //  }
+                        collisionSlot++;
+                      }
+                        //if (i%10 == angleCounter) {
+                            entity.recalculateTargetAngle();
+                        //}
+                        if ( entity instanceof AntEntity) {
+                            if ((entity.getTargetAngle() - entity.getAngle()) > Math.PI || ((entity.getTargetAngle() - entity.getAngle()) < 0 && (entity.getTargetAngle() - entity.getAngle() > Math.PI*-1 )))
+                                entity.addAngle(delta*-0.002);
+                            else entity.addAngle(delta*0.0021);
+                        }
+                    }
+                    angleCounter++;
+                    if (angleCounter>=10)
+                        angleCounter=0;
+                   
 
                     // if a game event has indicated that game logic should
                     // be resolved, cycle round every entity requesting that
@@ -335,6 +399,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                         entity.doLogic();
                     }
                 }
+                
 
                 logicRequiredThisLoop = false;
 
@@ -347,11 +412,13 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 //Render text above everything else
                 textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
                 /** Draw stats  **/
-                textRenderer.draw("FPS: " + (int) frameRate, 2, 20);
+                if (delta == 0) delta =1;
+                textRenderer.draw("FPS: " + (int) 1000/delta, 2, 20);
                 textRenderer.draw("FrameTime: " + frameTime, 60, 20);
                 textRenderer.draw("Food: " + home.getFoodAmount() + " units.", 2, 40);
                 textRenderer.draw("Food left: " + food.getFoodAmount() + " units", food.getX(), canvasHeight - food.getY() - 5);
-                textRenderer.draw("Food left: " + food2.getFoodAmount() + " units", food2.getX(), canvasHeight - food2.getY() - 5);
+              //  textRenderer.draw("Food left: " + food2.getFoodAmount() + " units", food2.getX(), canvasHeight - food2.getY() - 5);
+                textRenderer.draw("maurslukervinkel: " + maursluker.getAngle()+ "  : "+ maursluker.getTargetAngle(),2,100);
             // if a game event has indicated that game logic should
             // be resolved, cycle round every entity requesting that
 //            if (logicRequiredThisLoop) {
@@ -365,16 +432,11 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
             textRenderer.endRendering();
             //end render text
 
-            lastLoopTime = System.nanoTime();
+            //lastLoopTime = System.nanoTime();
 
             // flush the graphics commands to the card
             gl.glFlush();
-        }
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GameGL.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
     }
 
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
