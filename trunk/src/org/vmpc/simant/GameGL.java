@@ -88,7 +88,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     static Frame frame;
     private TextRenderer textRenderer;
     private Texture backgroundTexture;
-    public boolean stepOn = true;
+    public boolean stepOn = false;
     public int angleCounter = 0; // so not all the ants will recalculate their angles at the same time //together with stepOn==false..
 
     public static void main(String[] args) {
@@ -155,6 +155,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
             entities.add(entity);
             entity.setSpeed(40/* + x*/);
             entity.setAngleDegrees(1 + x * 7 * Math.random());
+            entity.setTargetAngle();
         }
 //        //nvm
         maursluker = new AntEntity(gl, this, "maur.png", home.getX() + 20, home.getY() + 20);
@@ -291,14 +292,14 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 
         // restore the model view matrix to prevent contamination
         gl.glPopMatrix();
-        /*
-        TextureCoords coords = backgroundTexture.getImageTexCoords();
+            /*
+            TextureCoords coords = backgroundTexture.getImageTexCoords();
         
-        float fw = w / 100.0f;
-        float fh = h / 100.0f;
-        gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
-        gl.glBegin(GL.GL_QUADS);
-        gl.glTexCoord2f(fw * coords.left(), fh * coords.bottom());
+            float fw = w / 100.0f;
+            float fh = h / 100.0f;
+            gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
+            gl.glBegin(GL.GL_QUADS);
+            gl.glTexCoord2f(fw * coords.left(), fh * coords.bottom());
         gl.glVertex3f(0, 0, 0);
         gl.glTexCoord2f(fw * coords.right(), fh * coords.bottom());
         gl.glVertex3f(w, 0, 0);
@@ -351,7 +352,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
             //if (!waitingForKeyPress) {
             /** Loop trough our entities **/
             int collisionSlot = 0;
-            for (int i = 0; i < entities.size(); i++) {
+            for (int i = 0; i < entities.size(); i++) { //maybe skip the home and food entities
                 Entity entity = (Entity) entities.get(i);
 
                 //NANO 50 000 ~ 100 000
@@ -361,7 +362,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 entity.draw();
 
                 //brutefoce collisions //not able to walk trough, move both 1 stage back?.. what happends then if one walks on another from the rear??
-
+                boolean changeAngle = true;
                 if (stepOn) {
                     for (int s = i + 1; s < entities.size(); s++) {
                         Entity me = entity;
@@ -378,58 +379,37 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                         collisionSlot++;
                     }
                 } else { //Yet another Vj test.
-                    for (int s = 0; s < entities.size(); s++) {
-                        if (s == i) {
+                    Entity me = entity;
+                    for (int s = 0; s < entities.size(); s++) { //checking against every single entity
+                        
+                        if (s == i)
                             continue;
-                        //should we check every bloody single  ant then?? wouldnt it cause problems with events?? yes :o //go back to multidim. arrays? trigger code, but not script
-                        //always walk to the left when hitting someone, unless youre hit from the rear, then walk right?
-                        //save the wanted angle.. always go one degree back to it if not hit.. go 5 degrees or smth in the other direction if hit.
-                        //if his-my ang norm 90 > x < -90, and he crashed in me, walk left, else walk left. how to see who walks into who?.. placement, and angle?
-                        }
-                        Entity me = (Entity) entities.get(i);
+
                         Entity him = (Entity) entities.get(s);
                         if (me.collidesWith(him)) {
-                            me.reverse(delta);
-
-                            if (me.collidesWith(him)) {
-                                me.move(delta);
-                            } else {
-                                //if (!collArray[collisionSlot]) {
-                                me.setGuilty(true);
-                                him.setGuilty(false);
-
-                                me.collidedWith(him);
-                                him.collidedWith(me);
+                            if ((entity instanceof AntEntity) && (him instanceof AntEntity)) {
+                                
+                                    me.reverse(delta); //may bug if he collides with more than one..
+                               // if (me.collidesWith(him))
+                                 //   me.move(delta);
                             }
-
-                        // collArray[collisionSlot] = true;
-                        //  }   
-                        }// else {
-                        //      collArray[collisionSlot] = false;
-                        //  }
-                        collisionSlot++;
-                    }
-                    //if (i%10 == angleCounter) {
-                    entity.recalculateTargetAngle();
-                    //}
-                    if (entity instanceof AntEntity) {
-                        if ((entity.getTargetAngle() - entity.getAngle()) > Math.PI || ((entity.getTargetAngle() - entity.getAngle()) < 0 && (entity.getTargetAngle() - entity.getAngle() > Math.PI * -1))) {
-                            entity.addAngle(delta * -0.002);
-                        } else {
-                            entity.addAngle(delta * 0.0021);
+                            me.collidedWith(him);
+                            him.collidedWith(me);
+                            changeAngle=false;
                         }
+                      }
+                    }  
+                if (entity instanceof AntEntity)
+                    entity.recalculateTargetAngle(changeAngle);
+                
+                    // if a game event has indicated that game logic should
+                    // be resolved, cycle round every entity requesting that
+                    // their personal logic should be considered.
+                
+                    if (logicRequiredThisLoop) {
+                        entity.doLogic();
                     }
                 }
-                angleCounter++;
-                if (angleCounter >= 10) {
-                    angleCounter = 0;                // if a game event has indicated that game logic should
-                // be resolved, cycle round every entity requesting that
-                // their personal logic should be considered.
-                }
-                if (logicRequiredThisLoop) {
-                    entity.doLogic();
-                }
-            }
 
 
             logicRequiredThisLoop = false;
