@@ -286,11 +286,12 @@ public abstract class Entity {
     public boolean getRound() {
         return true; //warning :O! TEST :p
     }
-    public void recalculateTargetAngle() {
+    public void recalculateTargetAngle(boolean change) {
     }
     public double getTargetAngle() {
         return angle;
     }
+    public void setTargetAngle() {}
     
     public void setGuilty(boolean guilt) {
     }

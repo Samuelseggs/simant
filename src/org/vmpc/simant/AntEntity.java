@@ -22,6 +22,7 @@ public class AntEntity extends Entity {
     public double targetangle = 0;
     public boolean headingForTarget = false;
     public boolean guilty = false;
+    public boolean angleDir = true;
 
     /**
      * Create a new entity to represent the players ship
@@ -107,10 +108,10 @@ public class AntEntity extends Entity {
         
     }
     public double getTargetAngle() {
-        if (headingForTarget)
+//        if (headingForTarget)
             return targetangle;
-        else
-            return Math.random()* 2.123;
+//        else
+//            return Math.random()* 2.123;
     }
 
     public boolean getKnowFood() {
@@ -128,18 +129,34 @@ public class AntEntity extends Entity {
        return true; //i want round hitboxes for ants (test)
     }
     
-    public void recalculateTargetAngle() {
-        if (headingForTarget){
-            if (!carryFood)
-                targetangle = this.calcAngle((double) this.foodX, (double) this.foodY);
+    public void recalculateTargetAngle(boolean change) {
+        if (change) {
+            if (this.headingForTarget) {
+                if (!carryFood)
+                    targetangle = this.calcAngle((double) this.foodX, (double) this.foodY);
+                else
+                    targetangle = this.calcAngle((double) game.homeX, (double) game.homeY);
+           } //else 
+             //   this.targetangle=angle;
+            
+
+            if ((this.getTargetAngle() - this.getAngle()) > Math.PI || ((this.getTargetAngle() - this.getAngle()) < 0 && (this.getTargetAngle() - this.getAngle() > Math.PI * -1)))
+                this.angleDir=true;
             else
-                targetangle = this.calcAngle((double) game.homeX, (double) game.homeY);
+                this.angleDir=false;
         }
+        if (this.angleDir)
+            this.addAngle(game.delta * -0.002);
+        else
+            this.addAngle(game.delta * 0.002);
     }
+    
     public void setGuilty(boolean guilt) {
         guilty=guilt;
     }
-
+    public void setTargetAngle() {
+        this.targetangle=super.angle;
+    }
     /**
      * Notification that the player's ship has collided with something
      * 
@@ -167,13 +184,13 @@ public class AntEntity extends Entity {
                 }
             }
            if (!game.stepOn) {
-               if (guilty) {
+              // if (guilty) {
                 double diff;
                 if ( ( (diff =((this.calcAngle( other.x, other.y)) - this.angle)) > Math.PI ) || ( (diff < 0) && (diff > Math.PI*-1) ) )
-                    this.addAngle(0.2); 
+                    this.angleDir=false;
                 else 
-                 this.addAngle(-0.2);
-               }
+                 this.angleDir=true;
+             //  }
 
            }
         } else if (other instanceof HomeEntity) {
@@ -190,9 +207,9 @@ public class AntEntity extends Entity {
                     this.targetangle = this.calcAngle((double) this.foodX, (double) this.foodY);
                 }
             }
-           if (!game.stepOn) {
-                   this.addAngle(-0.5);
-           }
+         //  if (!game.stepOn) {
+                   //this.addAngle(-0.5);
+       //    }
         } else if (other instanceof FoodEntity) {
             if (!this.carryFood) { //auto (not in the event)
 
@@ -217,9 +234,9 @@ public class AntEntity extends Entity {
                 this.iKnowFood = false;
                 this.headingForTarget = false;
             }
-            if (!game.stepOn) {
-               this.addAngle(-0.5);
-           }
+            //if (!game.stepOn) {
+          //     this.addAngle(-0.5);
+        //   }
         }
         
         //destination boolean variable? 
