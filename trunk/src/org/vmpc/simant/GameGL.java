@@ -14,13 +14,8 @@ import com.sun.opengl.util.texture.TextureIO;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 
-/**
- * JOGLGearsDemo.java <BR>
- * author: Brian Paul (converted to Java by Ron Cemer and Sven Goethel) <P>
- *
- * This version is equal to Brian Paul's version 1.2 1999/10/21
- */
 public class GameGL implements GLEventListener, MouseListener, MouseMotionListener, KeyListener {
 
     /** The stragey that allows us to use accelerate page flipping */
@@ -90,7 +85,9 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     private Texture backgroundTexture;
     public boolean stepOn = false;
     public int angleCounter = 0; // so not all the ants will recalculate their angles at the same time //together with stepOn==false..
-
+    
+    boolean isMousePressed = false;
+    
     public static void main(String[] args) {
 // set the properties of our openGL component...
         GLCapabilities glCaps = new GLCapabilities();
@@ -101,8 +98,10 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         glCaps.setDoubleBuffered(true); // double buffered
         frame = new Frame("SimAnt");
         GLCanvas canvas = new GLCanvas();
-
-        canvas.addGLEventListener(new GameGL());
+        GameGL gameGL = new GameGL();
+        canvas.addGLEventListener(gameGL);
+        canvas.addMouseListener(gameGL);
+        
         frame.add(canvas);
         frame.setSize(canvasWidth, canvasHeight);
         final Animator animator = new Animator(canvas);
@@ -124,6 +123,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 }).start();
             }
         });
+        
         frame.setVisible(true);
         animator.start();
     }
@@ -237,7 +237,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         gl.glLoadIdentity();
 
         gl.glOrtho(0, width, height, 0, -1, 1);
-        
+
         //Set the new sizes of the canvas (the game)
         canvasHeight = drawable.getHeight();
         canvasWidth = drawable.getWidth();
@@ -292,14 +292,14 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 
         // restore the model view matrix to prevent contamination
         gl.glPopMatrix();
-            /*
-            TextureCoords coords = backgroundTexture.getImageTexCoords();
+        /*
+        TextureCoords coords = backgroundTexture.getImageTexCoords();
         
-            float fw = w / 100.0f;
-            float fh = h / 100.0f;
-            gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
-            gl.glBegin(GL.GL_QUADS);
-            gl.glTexCoord2f(fw * coords.left(), fh * coords.bottom());
+        float fw = w / 100.0f;
+        float fh = h / 100.0f;
+        gl.glTexEnvi(GL.GL_TEXTURE_ENV, GL.GL_TEXTURE_ENV_MODE, GL.GL_REPLACE);
+        gl.glBegin(GL.GL_QUADS);
+        gl.glTexCoord2f(fw * coords.left(), fh * coords.bottom());
         gl.glVertex3f(0, 0, 0);
         gl.glTexCoord2f(fw * coords.right(), fh * coords.bottom());
         gl.glVertex3f(w, 0, 0);
@@ -381,17 +381,18 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 } else { //Yet another Vj test.
                     Entity me = entity;
                     for (int s = 0; s < entities.size(); s++) { //checking against every single entity
-                        
-                        if (s == i)
-                            continue;
 
+                        if (s == i) {
+                            continue;
+                        }
                         Entity him = (Entity) entities.get(s);
                         if (me.collidesWith(him)) {
                             if ((entity instanceof AntEntity) && (him instanceof AntEntity)) {
-                                
-                                    me.reverse(delta); //may bug if he collides with more than one..
-                               if (me.collidesWith(him))
-                                 me.move(delta);
+
+                                me.reverse(delta); //may bug if he collides with more than one..
+                                if (me.collidesWith(him)) {
+                                    me.move(delta);
+                                }
                              
                              changeAngle=false;
                             }
@@ -399,19 +400,17 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                             him.collidedWith(me);
                            
                         }
-                      }
-                    }  
-                if (entity instanceof AntEntity)
-                    entity.recalculateTargetAngle(changeAngle);
-                
-                    // if a game event has indicated that game logic should
-                    // be resolved, cycle round every entity requesting that
-                    // their personal logic should be considered.
-                
-                    if (logicRequiredThisLoop) {
-                        entity.doLogic();
                     }
                 }
+                if (entity instanceof AntEntity) {
+                    entity.recalculateTargetAngle(changeAngle);                // if a game event has indicated that game logic should
+                // be resolved, cycle round every entity requesting that
+                // their personal logic should be considered.
+                }
+                if (logicRequiredThisLoop) {
+                    entity.doLogic();
+                }
+            }
 
 
             logicRequiredThisLoop = false;
@@ -457,56 +456,53 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) {
     }
 
-    // Methods required for the implementation of MouseListener
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    public void mouseExited(MouseEvent e) {
-    }
-
-    public void mousePressed(MouseEvent e) {
-        prevMouseX = e.getX();
-        prevMouseY = e.getY();
-        if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
-            mouseRButtonDown = true;
-        }
-    }
-
-    public void mouseReleased(MouseEvent e) {
-        if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
-            mouseRButtonDown = false;
-        }
-    }
-
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    // Methods required for the implementation of MouseMotionListener
-    public void mouseDragged(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-        Dimension size = e.getComponent().getSize();
-
-        float thetaY = 360.0f * ((float) (x - prevMouseX) / (float) size.width);
-        float thetaX = 360.0f * ((float) (prevMouseY - y) / (float) size.height);
-
-        prevMouseX = x;
-        prevMouseY = y;
-
-        view_rotx += thetaX;
-        view_roty += thetaY;
-    }
-
-    public void mouseMoved(MouseEvent e) {
-    }
-
     public void keyTyped(KeyEvent arg0) {
     }
 
     public void keyPressed(KeyEvent arg0) {
+        
     }
 
     public void keyReleased(KeyEvent arg0) {
+    }
+
+    public void mouseClicked(MouseEvent e) {
+        
+    }
+
+    public void mousePressed(MouseEvent e) {
+        /*System.out.println(e.getY());
+        Entity mouseEntity = new Entity(gl, "mousepc.png", e.getX(), e.getY()) {
+
+            @Override
+            public void collidedWith(Entity other) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+        for(Iterator<Entity> it = entities.iterator(); it.hasNext();)
+        {
+            System.out.println(it.next().collidesWith(mouseEntity));
+        }*/
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        
+    }
+
+    public void mouseEntered(MouseEvent e) {
+        
+    }
+
+    public void mouseExited(MouseEvent e) {
+        
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        
     }
 }
 

@@ -88,7 +88,7 @@ public class TextureLoader {
      */
     public TextureGL getTexture(String resourceName) throws IOException {
         TextureGL tex = (TextureGL) table.get(resourceName);
-
+        
         if (tex != null) {
             return tex;
         }
