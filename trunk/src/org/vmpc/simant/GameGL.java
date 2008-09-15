@@ -150,7 +150,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 //        food2.setAngleDegrees(200);
 
         //adding more ants..
-        for (int x = 1; x < 50; x++) {
+        for (int x = 1; x < 25; x++) {
             Entity entity = new AntEntity(gl, this, "maur2.png", home.getX() + 20, home.getY() + 20);
             entities.add(entity);
             entity.setSpeed(40/* + x*/);
@@ -392,10 +392,12 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                                     me.reverse(delta); //may bug if he collides with more than one..
                                if (me.collidesWith(him))
                                  me.move(delta);
+                             
+                             changeAngle=false;
                             }
                             me.collidedWith(him);
                             him.collidedWith(me);
-                            changeAngle=false;
+                           
                         }
                       }
                     }  

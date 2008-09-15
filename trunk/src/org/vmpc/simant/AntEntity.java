@@ -140,7 +140,7 @@ public class AntEntity extends Entity {
              //   this.targetangle=angle;
             
 
-            if ((this.getTargetAngle() - this.getAngle()) > Math.PI || ((this.getTargetAngle() - this.getAngle()) < 0 && (this.getTargetAngle() - this.getAngle() > Math.PI * -1)))
+            if ((this.getTargetAngle()+Math.PI/8 - this.getAngle()) > Math.PI || ((this.getTargetAngle()+Math.PI/8 - this.getAngle()) < 0 && (this.getTargetAngle()+Math.PI/8 - this.getAngle() > Math.PI * -1)))
                 this.angleDir=true;
             else
                 this.angleDir=false;
