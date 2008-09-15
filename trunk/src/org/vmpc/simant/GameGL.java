@@ -470,21 +470,23 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     }
 
     public void mousePressed(MouseEvent e) {
-        System.out.println(e.getY());
+        boolean someOneIsSelected = false;
+        //Create a temporary entity where the mouse clicks
         Entity mouseEntity = new Entity(gl, "mousepc.png", e.getX(), e.getY()) {
 
             @Override
             public void collidedWith(Entity other) {
-                throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        boolean someOneIsSelected = false;
+        //Iterate through all the entities
         for (Iterator<Entity> it = entities.iterator(); it.hasNext() && !someOneIsSelected;) {
-            Entity entity = (Entity) it.next();
-            if (entity instanceof AntEntity) {
-                if (entity.collidesWith(mouseEntity)) {
-                    entity.setDragged(true);
-                    draggedEntity = entity;
+            
+            Entity entity = it.next();//Set the next iterator to another variable name
+            
+            if (entity instanceof AntEntity) {//If it is an ant
+                if (entity.collidesWith(mouseEntity)) { //Check if the mouseEntity collides with an ant
+                    entity.setDragged(true); //set the entity state to dragged
+                    draggedEntity = entity; //set the dragged entity
                 }
             }
         }
@@ -493,10 +495,11 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     public void mouseReleased(MouseEvent e) {
         for (Iterator<Entity> it = entities.iterator(); it.hasNext();) {
             Entity entity = (Entity) it.next();
-            //Since we are no longer holding in our mouse button, no entities may be dragged no more
-            entity.setDragged(false);
-            draggedEntity = null;
+            
+            entity.setDragged(false); //Since we are no longer holding in our mouse button, no entities may be dragged no more
+            
         }
+        draggedEntity = null;
     }
 
     public void mouseEntered(MouseEvent e) {
