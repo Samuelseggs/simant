@@ -78,16 +78,17 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     //GL vars
     /** The OpenGL content, we use this to access all the OpenGL commands */
     private GL gl;
-    private GLCanvas canvas;
+    private static GLCanvas canvas;
     TextureLoader textureLoader;
     static Frame frame;
     private TextRenderer textRenderer;
     private Texture backgroundTexture;
     public boolean stepOn = false;
     public int angleCounter = 0; // so not all the ants will recalculate their angles at the same time //together with stepOn==false..
-    
     boolean isMousePressed = false;
-    
+    //Entity which is currently being dragged
+    Entity draggedEntity;
+
     public static void main(String[] args) {
 // set the properties of our openGL component...
         GLCapabilities glCaps = new GLCapabilities();
@@ -97,11 +98,11 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
         glCaps.setAlphaBits(8);
         glCaps.setDoubleBuffered(true); // double buffered
         frame = new Frame("SimAnt");
-        GLCanvas canvas = new GLCanvas();
+        canvas = new GLCanvas();
         GameGL gameGL = new GameGL();
         canvas.addGLEventListener(gameGL);
         canvas.addMouseListener(gameGL);
-        
+        canvas.addMouseMotionListener(gameGL);
         frame.add(canvas);
         frame.setSize(canvasWidth, canvasHeight);
         final Animator animator = new Animator(canvas);
@@ -123,7 +124,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 }).start();
             }
         });
-        
+
         frame.setVisible(true);
         animator.start();
     }
@@ -354,11 +355,11 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
             int collisionSlot = 0;
             for (int i = 0; i < entities.size(); i++) { //maybe skip the home and food entities
                 Entity entity = (Entity) entities.get(i);
-
-                //NANO 50 000 ~ 100 000
-                entity.move(delta);
-
-                //move the entity
+                //Skip moving entities which are being dragged
+                if (!entity.isDragged()) {
+                    //move the entity
+                    entity.move(delta);
+                }
                 entity.draw();
 
                 //brutefoce collisions //not able to walk trough, move both 1 stage back?.. what happends then if one walks on another from the rear??
@@ -393,12 +394,12 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                                 if (me.collidesWith(him)) {
                                     me.move(delta);
                                 }
-                             
-                             changeAngle=false;
+
+                                changeAngle = false;
                             }
                             me.collidedWith(him);
                             him.collidedWith(me);
-                           
+
                         }
                     }
                 }
@@ -460,18 +461,16 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
     }
 
     public void keyPressed(KeyEvent arg0) {
-        
     }
 
     public void keyReleased(KeyEvent arg0) {
     }
 
     public void mouseClicked(MouseEvent e) {
-        
     }
 
     public void mousePressed(MouseEvent e) {
-        /*System.out.println(e.getY());
+        System.out.println(e.getY());
         Entity mouseEntity = new Entity(gl, "mousepc.png", e.getX(), e.getY()) {
 
             @Override
@@ -479,30 +478,42 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        for(Iterator<Entity> it = entities.iterator(); it.hasNext();)
-        {
-            System.out.println(it.next().collidesWith(mouseEntity));
-        }*/
+        boolean someOneIsSelected = false;
+        for (Iterator<Entity> it = entities.iterator(); it.hasNext() && !someOneIsSelected;) {
+            Entity entity = (Entity) it.next();
+            if (entity instanceof AntEntity) {
+                if (entity.collidesWith(mouseEntity)) {
+                    entity.setDragged(true);
+                    draggedEntity = entity;
+                }
+            }
+        }
     }
 
     public void mouseReleased(MouseEvent e) {
-        
+        for (Iterator<Entity> it = entities.iterator(); it.hasNext();) {
+            Entity entity = (Entity) it.next();
+            //Since we are no longer holding in our mouse button, no entities may be dragged no more
+            entity.setDragged(false);
+            draggedEntity = null;
+        }
     }
 
     public void mouseEntered(MouseEvent e) {
-        
     }
 
     public void mouseExited(MouseEvent e) {
-        
     }
 
     public void mouseDragged(MouseEvent e) {
-        
+        System.out.println(e.getY());
+        if (draggedEntity != null) {
+            draggedEntity.setX(e.getX());
+            draggedEntity.setY(e.getY());
+        }
     }
 
     public void mouseMoved(MouseEvent e) {
-        
     }
 }
 

@@ -37,6 +37,10 @@ public abstract class Entity {
     private Rectangle me = new Rectangle();
     /** The rectangle used for other entities during collision resolution */
     private Rectangle him = new Rectangle();
+    /** **/
+    private boolean dragged;
+    
+
 
     /**
      * Construct a entity based on a sprite image and a location.
@@ -198,14 +202,7 @@ public abstract class Entity {
      * @param g The graphics context on which to draw
      */
     public void draw() {
-        double theta = angle;
-        double thetaX = x + sprite.getWidth() / 2;
-        double thetaY = y + sprite.getHeight() / 2;
-        //g.rotate(theta, thetaX, thetaY);
-
         sprite.draw((int) x, (int) y, angle);
-
-    //g.rotate(-theta, thetaX, thetaY);
     }
 
     /**
@@ -231,6 +228,14 @@ public abstract class Entity {
      */
     public int getY() {
         return (int) y;
+    }
+    
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
     }
 
     //didnt know how to call AntEntity functions :D
@@ -376,10 +381,20 @@ public abstract class Entity {
         return me.intersects(him);
     }
 
+
+    public boolean isDragged() {
+        return dragged;
+    }
+
+    public void setDragged(boolean dragged) {
+        this.dragged = dragged;
+    }
     /**
      * Notification that this entity collided with another.
      * 
      * @param other The entity with which this entity collided.
      */
     public abstract void collidedWith(Entity other);
+    
+    
 }
