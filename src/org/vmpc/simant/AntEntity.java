@@ -184,14 +184,32 @@ public class AntEntity extends Entity {
                 }
             }
            if (!game.stepOn) {
-              // if (guilty) {
-                double diff;
-                if ( ( (diff =((this.calcAngle( other.x, other.y)) - this.angle)) > Math.PI ) || ( (diff < 0) && (diff > Math.PI*-1) ) )
+               double diff =((this.calcAngle( other.x, other.y)) - this.angle);
+               if (diff < 0)
+                   diff+=2*Math.PI;
+                  
+                if (diff > Math.PI) //turn away from the oponent.
                     this.angleDir=false;
                 else 
                  this.angleDir=true;
-             //  }
-
+               double viewang = other.angle-this.angle;
+               if (viewang < 0)
+                   viewang+=2*Math.PI;
+               if (viewang < Math.PI/2 || viewang > 2*Math.PI) { //but if we're looking in the same dir, one has to turn against the other.
+                   //if mydiff < otherdiff.. turn against him.. else turn away.
+//                  diff-=Math.PI;
+//                  double otherdiff= ((other.calcAngle( this.x, this.y)) - other.angle);
+//                  if (otherdiff < 0)
+//                      otherdiff +=2*Math.PI;
+//                  otherdiff-=Math.PI;
+//                  if (otherdiff<0)
+//                      otherdiff*=-1;
+//                   if (diff<0)
+//                       diff*=-1;
+//                  if (diff<otherdiff)
+//                      this.angleDir= !this.angleDir;
+                   this.angleDir=true;
+               }
            }
         } else if (other instanceof HomeEntity) {
             if (this.carryFood) { //auto (not set by the player)

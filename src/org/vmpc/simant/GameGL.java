@@ -390,8 +390,8 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                             if ((entity instanceof AntEntity) && (him instanceof AntEntity)) {
                                 
                                     me.reverse(delta); //may bug if he collides with more than one..
-                               // if (me.collidesWith(him))
-                                 //   me.move(delta);
+                               if (me.collidesWith(him))
+                                 me.move(delta);
                             }
                             me.collidedWith(him);
                             him.collidedWith(me);
