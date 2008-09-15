@@ -151,7 +151,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
 //        food2.setAngleDegrees(200);
 
         //adding more ants..
-        for (int x = 1; x < 25; x++) {
+        for (int x = 1; x < 50; x++) {
             Entity entity = new AntEntity(gl, this, "maur2.png", home.getX() + 20, home.getY() + 20);
             entities.add(entity);
             entity.setSpeed(40/* + x*/);
@@ -383,7 +383,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                     Entity me = entity;
                     for (int s = 0; s < entities.size(); s++) { //checking against every single entity
 
-                        if (s == i) {
+                        if (s == i) { //dont check against itself
                             continue;
                         }
                         Entity him = (Entity) entities.get(s);
@@ -391,7 +391,7 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                             if ((entity instanceof AntEntity) && (him instanceof AntEntity)) {
 
                                 me.reverse(delta); //may bug if he collides with more than one..
-                                if (me.collidesWith(him)) {
+                                if (me.collidesWith(him)) { //keep on moving if we cant get away by reversing
                                     me.move(delta);
                                 }
 
@@ -403,11 +403,12 @@ public class GameGL implements GLEventListener, MouseListener, MouseMotionListen
                         }
                     }
                 }
-                if (entity instanceof AntEntity) {
-                    entity.recalculateTargetAngle(changeAngle);                // if a game event has indicated that game logic should
+                if (entity instanceof AntEntity) { //recalculate the moveangle
+                    entity.recalculateTargetAngle(changeAngle);
+                }
+                // if a game event has indicated that game logic should
                 // be resolved, cycle round every entity requesting that
                 // their personal logic should be considered.
-                }
                 if (logicRequiredThisLoop) {
                     entity.doLogic();
                 }

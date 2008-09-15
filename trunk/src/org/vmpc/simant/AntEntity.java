@@ -52,28 +52,28 @@ public class AntEntity extends Entity {
         
         // if we're moving left and have reached the left hand side
         // of the screen, jump to the right hand side
-        if ((dx < 0) && (x < 0 - sprite.getWidth())) {
-            x = game.getcanvasWidth();
+        if ((dx < 0) && (x < 0 - sprite.getWidth()/2)) {
+            x = game.getcanvasWidth()+ sprite.getWidth()/2;
             return;
         }
 
         // if we're moving right and have reached the right hand side
         // of the screen, jump to the left hand side
-        if ((dx > 0) && (x > game.getcanvasWidth()/* pluss halve størrelsen*/)) {
-            x = 0 - sprite.getWidth();
+        if ((dx > 0) && (x > game.getcanvasWidth()+ sprite.getWidth()/2)) {
+            x = 0 - sprite.getWidth()/2;
             return;
         }
         // if we're moving up and have reached the top
         // of the screen, jump to the bottom
-        if ((dy < 0) && (y < 0 - sprite.getHeight())) {
-            y = game.getcanvasHeight();
+        if ((dy < 0) && (y < 0 - sprite.getHeight()/2)) {
+            y = game.getcanvasHeight()+ sprite.getWidth()/2;
             return;
         }
 
         // if we're moving down and have reached the bottom
         // of the screen, jump to the top
-        if ((dy > 0) && (y > game.getcanvasHeight()/* pluss halve størrelsen*/)) {
-            y = 0 - sprite.getHeight();
+        if ((dy > 0) && (y > game.getcanvasHeight()+ sprite.getWidth()/2)) {
+            y = 0 - sprite.getHeight()/2;
             return;
         }
     }
@@ -81,28 +81,28 @@ public class AntEntity extends Entity {
         super.reverse(delta);
          // if we're moving left and have reached the left hand side
         // of the screen, jump to the right hand side
-        if ((dx*-1 < 0) && (x < 0 - sprite.getWidth())) {
-            x = game.getcanvasWidth();
+        if ((dx*-1 < 0) && (x < 0 - sprite.getWidth()/2)) {
+            x = game.getcanvasWidth()+ sprite.getWidth()/2;
             return;
         }
 
         // if we're moving right and have reached the right hand side
         // of the screen, jump to the left hand side
-        if ((dx*-1 > 0) && (x > game.getcanvasWidth()/* pluss halve størrelsen*/)) {
-            x = 0 - sprite.getWidth();
+        if ((dx*-1 > 0) && (x > game.getcanvasWidth()+ sprite.getWidth()/2)) {
+            x = 0 - sprite.getWidth()/2;
             return;
         }
         // if we're moving up and have reached the top
         // of the screen, jump to the bottom
-        if ((dy*-1 < 0) && (y < 0 - sprite.getHeight())) {
-            y = game.getcanvasHeight();
+        if ((dy*-1 < 0) && (y < 0 - sprite.getHeight()/2)) {
+            y = game.getcanvasHeight()+ sprite.getWidth()/2;
             return;
         }
 
         // if we're moving down and have reached the bottom
         // of the screen, jump to the top
-        if ((dy*-1 > 0) && (y > game.getcanvasHeight()/* pluss halve størrelsen*/)) {
-            y = 0 - sprite.getHeight();
+        if ((dy*-1 > 0) && (y > game.getcanvasHeight()+ sprite.getWidth()/2)) {
+            y = 0 - sprite.getHeight()/2;
             return;
         }
         
